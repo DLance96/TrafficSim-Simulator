@@ -3,7 +3,14 @@ import time
 from vehicles.StandardCar import StandardCar
 from drivers.BasicDriver import BasicDriver
 
+
 class Vehicle:
+
+    class VehicleNeighbors:
+
+        def __init__(self):
+            self.last_update_time_ms = 0
+            self.nearby_vehicles = []
 
     def __init__(self, road, ticktime_ms, x=0, y=0, vx=0, vy=0, orientation=0, cartype=StandardCar(), drivertype=BasicDriver()):
         """
@@ -26,7 +33,7 @@ class Vehicle:
         self.orientation = orientation
         self.ticktime_ms = ticktime_ms
         self.road = road
-        self.vehicle_neigbors = Vehicle_Neighbors()
+        self.vehicle_neigbors = self.VehicleNeighbors()
         self.cartype = cartype
         self.drivertype = drivertype
 
@@ -75,7 +82,16 @@ class Vehicle:
                 self.ax = min((self.road.speed_limit - self.vx) / self.drivertype.accel_time, self.drivertype.max_accel)
 
 
-
+    def update_vehicle_neighbors(self, nearby_vehicles):
+        """
+        :param nearby_vehicles: Vehicle list
+        must have the car in front inside this list to properly respond
+        called from Road
+        :return: None
+        """
+        if nearby_vehicles.last_update_time_ms < int(time.time() * 1000):
+            self.nearby_vehicles.nearby_vehicles = nearby_vehicles
+            self.nearby_vehicles.last_update_time_ms = int(time.time() * 1000)
 
 
     def tick(self):
@@ -109,21 +125,3 @@ class Vehicle:
 
         else:
             return 0
-
-
-
-class Vehicle_Neighbors:
-
-    def __init__(self):
-        self.last_update_time_ms = 0
-        self.nearby_vehicles = []
-
-    def update(self, nearby_vehicles):
-        """
-        :param nearby_vehicles: Vehicle list
-        must have the car in front inside this list to properly respond
-        update only when last_update_time < current_time - car's update_ime
-        :return: None
-        """
-        self.nearby_vehicles = nearby_vehicles
-        self.last_update_time_ms = int(time.time() * 1000)
