@@ -1,7 +1,7 @@
 import time
 
-from vehicles.StandardCar import StandardCar
-from drivers.BasicDriver import BasicDriver
+from vehicles.VehicleTemplate import StandardCar
+from drivers.DriverTemplate import BasicDriver
 
 
 class Vehicle:
@@ -15,8 +15,8 @@ class Vehicle:
     def __init__(self, road, ticktime_ms, x=0, y=0, vx=0, vy=0, orientation=0, cartype=StandardCar(), drivertype=BasicDriver()):
         """
         :param road: Road
-        :param ticktime: float
-        ticktime is the time between simulation ticks in ms
+        :param ticktime_ms: float
+        ticktime_ms is the time between simulation ticks in ms
         :param x: float
         :param y: float
         :param vx: float
@@ -36,7 +36,6 @@ class Vehicle:
         self.vehicle_neigbors = self.VehicleNeighbors()
         self.cartype = cartype
         self.drivertype = drivertype
-
 
 
     def get_intended_position(self, time_ahead):
@@ -63,17 +62,17 @@ class Vehicle:
 
         return -1
 
-    def update_self(self):
+    def compute_next_location(self):
         """
         called by the road to update the cars intended positions
         TODO: update method to allow smooth acceleration in traffic
-        :return:
+        :return: (float, float)
         """
         brake_decel = 0
         for vehicle in self.vehicle_neigbors.nearby_vehicles:
             brake_decel += self.respond_vehicle_brake(vehicle)
 
-        brake_decel = min(brake_decel, self.drivertype.max_break_decel)
+        brake_decel = min(brake_decel, self.drivertype.max_brake_decel)
 
         if brake_decel > 0:
             self.ax = -brake_decel
@@ -81,6 +80,11 @@ class Vehicle:
             if self.road.speed_limit > self.vx:
                 self.ax = min((self.road.speed_limit - self.vx) / self.drivertype.accel_time, self.drivertype.max_accel)
 
+        self.vx += self.ax * self.ticktime_ms / 1000
+
+        self.vy += self.ay * self.ticktime_ms / 1000
+
+        return (self.x + self.vx * self.ticktime_ms / 1000, self.y + self.vy * self.ticktime_ms / 1000)
 
     def update_vehicle_neighbors(self, nearby_vehicles):
         """
@@ -93,21 +97,15 @@ class Vehicle:
             self.nearby_vehicles.nearby_vehicles = nearby_vehicles
             self.nearby_vehicles.last_update_time_ms = int(time.time() * 1000)
 
-
-    def tick(self):
+    def update_location(self, x, y):
         """
         called after all cars have run update_self
         is only called by the road
         :return: None
         """
-        self.vx += self.ax * self.ticktime_ms / 1000
+        self.x = x
 
-        self.vy += self.ay * self.ticktime_ms / 1000
-
-        self.x += self.vx * self.ticktime_ms / 1000
-
-        self.y += self.vy * self.ticktime_ms / 1000
-
+        self.y = y
 
     def respond_vehicle_brake(self, other_vehicle):
         """
