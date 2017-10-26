@@ -171,14 +171,14 @@ class Road:
 
     def which_neighbor(self, location):
         """
-        akes a global coordinate and returns which, if any of the neighboring intersections contains that coordinate
+        Takes a global coordinate and returns which, if any of the neighboring intersections contain that coordinate
         :param location:
         :return:
         """
 
-        if self.initial_intersection.is_global_in_intersection(self.local_to_global_location_conversion(location)):
+        if self.initial_intersection.is_global_in_intersection(location):
             return self.initial_intersection
-        elif self.terminal_intersection.is_global_in_intersection(self.local_to_global_location_conversion(location)):
+        elif self.terminal_intersection.is_global_in_intersection(location):
             return self.terminal_intersection
         else:
             raise ValueError("No neighbor contains that location.")
@@ -303,7 +303,7 @@ class Road:
             y = (random.randint(0, self.outbound_lanes - 1) + .5) * self.lane_width
             # Pick an x location so that the car is just fully on the road
             x = vehicle_length / 2
-            spawned_vehicle = Vehicle(self, x=x, y=y, vx=0, vy=0, orientation=self.orientation,
+            spawned_vehicle = Vehicle(self, x=x, y=y, vx=.1, vy=0, orientation= self.orientation,
                                       cartype=vehicle_template, drivertype=driver_template)
             # Accepts a transfer from nowhere, kinda silly. Maybe rename accept_transfer for clarity?
             self.accept_transfer(spawned_vehicle, self.local_to_global_location_conversion((x, y)))

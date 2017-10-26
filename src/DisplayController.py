@@ -74,7 +74,14 @@ class DisplayController:
 
         self.draw_surface.fill(Color(255, 255, 255))
 
-        for road in traffic_map.roadlist:
+        for intersection in traffic_map.get_intersections():
+            self.drawIntersection(intersection)
+            # for vehicle in intersection.vehicles:
+                # we do need to be able to render vehicles in intersections at some point
+                # drawVehicle can't be hardcoded to take roads
+                # self.drawVehicle(intersection, vehicle)
+
+        for road in traffic_map.get_roads():
             self.drawRoad(road)
             for vehicle in road.vehicles:
                 self.drawVehicle(road, vehicle)
