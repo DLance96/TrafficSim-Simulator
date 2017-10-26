@@ -36,51 +36,96 @@ class Bucket:
         self.alive = False
 
     def is_alive(self):
+        """
+        Returns the aliveness status of the Bucket. Used to limit computation when vehicles seek nearby vehicles.
+        :return:
+        """
 
         return self.alive
 
 
     def set_previous_bucket(self, bucket):
+        """
+        Sets the previous_bucket variable
+        :param bucket:
+        :return:
+        """
 
         self.previous_bucket = bucket
 
         return
 
     def set_next_bucket(self, bucket):
+        """
+        Sets the next_bucket variable
+        :param bucket:
+        :return:
+        """
 
         self.next_bucket = bucket
 
         return
 
     def set_previous_alive_bucket(self, bucket):
+        """
+        Sets the previous_alive_bucket variable
+        :param bucket:
+        :return:
+        """
 
         self.previous_alive_bucket = bucket
 
         return
 
-    def set_next_alive_bucket(self):
+    def set_next_alive_bucket(self, bucket):
+        """
+        Sets the next_alive_bucket variable
+        :return:
+        """
 
         self.next_alive_bucket = bucket
 
         return
 
     def get_previous_bucket(self):
+        """
+        Gets the previous_bucket variable
+        :return:
+        """
 
         return self.previous_bucket
 
     def get_next_bucket(self):
+        """
+        Gets the next_bucket variable
+        :return:
+        """
 
         return self.next_bucket
 
     def get_previous_alive_bucket(self):
+        """
+        Gets the previous_alive_bucket variable
+        :return:
+        """
 
         return self.previous_alive_bucket
 
     def get_next_alive_bucket(self):
+        """
+        Gets the next_alive_bucket variable
+        :return:
+        """
 
         return self.next_alive_bucket
 
     def add(self, vehicle):
+        """
+        Adds the provided vehicle to the Bucket, replacing the vehicle's existing Bucket
+        variable with this Bucket. Updates aliveness and the aliveness linked list.
+        :param vehicle:
+        :return:
+        """
 
         self.vehicles.append(vehicle)
         self.number_of_vehicles += 1
@@ -94,16 +139,23 @@ class Bucket:
             while((next is not None) and not next.is_alive()):
                 next = next.get_next_bucket()
             self.next_alive_bucket = next
+            next.set_previous_alive_bucket(self)
 
             # seek the previous live bucket
             prev = self.prev_bucket
             while((prev is not None) and not prev.is_alive()):
                 prev = prev.get_previous_bucket()
             self.previous_alive_bucket = prev
+            prev.set_next_alive_bucket(self)
 
         return
 
     def remove(self, vehicle):
+        """
+        Removes the provided vehicle from the Bucket. Updates aliveness and the aliveness linked list.
+        :param vehicle:
+        :return:
+        """
 
         self.vehicles.remove(vehicle)
         self.number_of_vehicles -= 1
@@ -118,6 +170,10 @@ class Bucket:
         return
 
     def get_vehicles(self):
+        """
+        Gets the list of vehicles currently in the Bucket
+        :return:
+        """
 
         return self.vehicles
 
