@@ -139,14 +139,16 @@ class Bucket:
             while((next is not None) and not next.is_alive()):
                 next = next.get_next_bucket()
             self.next_alive_bucket = next
-            next.set_previous_alive_bucket(self)
+            if next is not None:
+                next.set_previous_alive_bucket(self)
 
             # seek the previous live bucket
-            prev = self.prev_bucket
+            prev = self.previous_bucket
             while((prev is not None) and not prev.is_alive()):
                 prev = prev.get_previous_bucket()
             self.previous_alive_bucket = prev
-            prev.set_next_alive_bucket(self)
+            if prev is not None:
+                prev.set_next_alive_bucket(self)
 
         return
 

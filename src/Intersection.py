@@ -74,7 +74,7 @@ class Intersection:
         result = (math.sqrt(math.pow(location[0], 2) + math.pow(location[1], 2)) < self.radius)
         return result
 
-    def is_global_on_road(self, location):
+    def is_global_in_intersection(self, location):
         """
         Takes a global coordinate and returns whether or not it is on the road
         :param location:

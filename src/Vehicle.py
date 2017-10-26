@@ -1,7 +1,7 @@
 import time
 
-from vehicles.VehicleTemplate import StandardCar
-from drivers.DriverTemplate import BasicDriver
+from vehicles.VehicleTemplate import VehicleTemplate
+from drivers.DriverTemplate import DriverTemplate
 
 
 class Vehicle:
@@ -12,7 +12,7 @@ class Vehicle:
             self.last_update_time_ms = 0
             self.nearby_vehicles = []
 
-    def __init__(self, road, ticktime_ms, x=0, y=0, vx=0, vy=0, orientation=0, cartype=StandardCar(), drivertype=BasicDriver()):
+    def __init__(self, road, x=0, y=0, vx=0, vy=0, orientation=0, cartype=VehicleTemplate(), drivertype=DriverTemplate()):
         """
         :param road: Road
         :param ticktime_ms: float
@@ -31,12 +31,35 @@ class Vehicle:
         self.ax = 0
         self.ay = 0
         self.orientation = orientation
-        self.ticktime_ms = ticktime_ms
         self.road = road
         self.intersection = None
         self.vehicle_neigbors = self.VehicleNeighbors()
         self.cartype = cartype
         self.drivertype = drivertype
+        self.bucket = None
+
+    def set_bucket(self, bucket):
+        """
+        Sets the bucket in which the car resides
+        :param bucket:
+        :return:
+        """
+        self.bucket = bucket
+        return
+
+    def get_bucket(self):
+        """
+        Gets the bucket in which the car resides
+        :return:
+        """
+        return self.bucket
+
+    def get_location(self):
+        """
+        Returns the vehicle's current local location
+        :return:
+        """
+        return (self.x, self.y)
 
 
     def get_intended_position(self, time_ahead):
