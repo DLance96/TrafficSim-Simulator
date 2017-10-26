@@ -1,4 +1,5 @@
 import math
+import random
 from collections import defaultdict
 from shapely import geometry
 from Bucket import Bucket
@@ -257,6 +258,7 @@ class Road:
         """
 
         locations = [vehicle.get_location() for vehicle in self.vehicles]
+        # Actually need to get the actual sizes of cars to figure out if they have collided
 
         for vehicle_index in self.list_duplicates(locations):
             self.vehicles[vehicle_index].crash()
@@ -276,13 +278,34 @@ class Road:
 
     def spawn(self, vehicle_template, driver_template, direction):
         """
-        Takes the necessary inputs to generate a vehicle and generates the corresponding vehicles on a
-        random lane at x = 0 driving outbound
+        Takes the necessary inputs to generate a vehicle and attempts to generate the corresponding vehicles on a
+        random lane at the beginning of the road driving outbound. If it would spawn on the same x-value as any
+        existing vehicle, instead it is not spawned.
         :param vehicle_template:
         :param driver_template:
         :param direction:
         :return:
         """
+
+        nearby_vehicles = bucket_list[0].first_bucket.get_vehicles()
+        vehicle_length = vehicle_template.length
+        clear = True
+        # If the created vehicle were be adjacent to any vehicle, we don't want to spawn it
+        # Later we could replace this with a direct collision check
+        for vehicle in nearby_vehicles:
+            if vehicle.get_location() - vehicle.get_cartype().length / 2 <= vehicle_length:
+                clear = False
+
+        if clear:
+            # Pick a y location corresponding to the center of a random outbound lane
+            y = (random.randint(0, self.outbound_lanes - 1) + .5) * self.lane_width
+            # Pick an x location so that the car is just fully on the road
+            x = vehicle_length / 2
+            spawned_vehicle = Vehicle(self, x=x, y=y, vx=0, vy=0, orientation=self.orientation,
+                                      cartype=vehicle_template, drivertype=driver_template)
+            # Accepts a transfer from nowhere, kinda silly. Maybe rename accept_transfer for clarity?
+            self.accept_transfer(spawned_vehicle, (x, y))
+
         return
 
     def add_neighboring_intersection(self, intersection, end):
