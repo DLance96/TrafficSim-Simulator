@@ -1,5 +1,10 @@
-from Road import Road
-from Intersection import Intersection
+from src.SimulationController import SimulationController
+from src.TrafficMap import TrafficMap
+from src.Road import Road
+from src.Intersection import Intersection
+from src.drivers.DriverTemplate import  DriverTemplate
+from src.vehicles.VehicleTemplate import VehicleTemplate
+import pytest
 
 def init_intersection(anchor, length, inbound_lanes, outbound_lanes, orientation, speed_limit):
     road = Road(anchor, length, inbound_lanes, outbound_lanes, orientation)
@@ -25,4 +30,20 @@ def add_intersections_to_road(speed_limit_1, speed_limit_2):
     return (out1, out2)
 
 def test_add_intersections_to_road():
-    assert test_adding_intersections_to_road(100, 200) == (100, 200)
+    assert add_intersections_to_road(100, 200) == (100, 200)
+
+def test_road_handoff():
+    trafficmap = TrafficMap()
+    onlyroad = Road([200, 200], 200, 2, 2, 0, 200)
+    initial_intersection = Intersection(center=(200, 220), radius=30, speed_limit=200)
+    terminal_intersection = Intersection(center=(400, 220), radius=30, speed_limit=200)
+    onlyroad.add_neighboring_intersection(initial_intersection, 'initial')
+    onlyroad.add_neighboring_intersection(terminal_intersection, 'terminal')
+    trafficmap.roadlist.append(onlyroad)
+    trafficmap.intersectionlist.append(initial_intersection)
+    trafficmap.intersectionlist.append(terminal_intersection)
+    controller = SimulationController(trafficmap, 20, 10, 60)
+    onlyroad.spawn(VehicleTemplate(), DriverTemplate(), 0)
+    with pytest.raises(Exception) as einfo:
+        assert controller.run()
+

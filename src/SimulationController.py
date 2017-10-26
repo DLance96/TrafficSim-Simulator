@@ -1,5 +1,5 @@
 import pygame
-from DisplayController import DisplayController
+from src.DisplayController import DisplayController
 
 from pygame.locals import *
 

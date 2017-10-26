@@ -2,8 +2,8 @@ import math
 import random
 from collections import defaultdict
 from shapely import geometry
-from Bucket import Bucket
-from Vehicle import Vehicle
+from src.Bucket import Bucket
+from src.Vehicle import Vehicle
 
 class Road:
 

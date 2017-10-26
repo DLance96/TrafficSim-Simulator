@@ -1,5 +1,5 @@
-from Road import Road
-from Intersection import Intersection
+from src.Road import Road
+from src.Intersection import Intersection
 
 def init_intersection(center, radius, speed_limit):
     intersection = Intersection(center=center, radius=radius, speed_limit=speed_limit)

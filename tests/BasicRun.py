@@ -1,9 +1,9 @@
-from SimulationController import SimulationController
-from TrafficMap import TrafficMap
-from Road import Road
-from Intersection import Intersection
-from drivers.DriverTemplate import  DriverTemplate
-from vehicles.VehicleTemplate import VehicleTemplate
+from src.SimulationController import SimulationController
+from src.TrafficMap import TrafficMap
+from src.Road import Road
+from src.Intersection import Intersection
+from src.drivers.DriverTemplate import  DriverTemplate
+from src.vehicles.VehicleTemplate import VehicleTemplate
 
 trafficmap = TrafficMap()
 onlyroad = Road([200,200],200, 2, 2, 0, 200)

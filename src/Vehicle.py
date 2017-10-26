@@ -1,7 +1,7 @@
 import time
 
-from vehicles.VehicleTemplate import VehicleTemplate
-from drivers.DriverTemplate import DriverTemplate
+from src.vehicles.VehicleTemplate import VehicleTemplate
+from src.drivers.DriverTemplate import DriverTemplate
 
 
 class Vehicle:

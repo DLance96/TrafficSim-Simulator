@@ -1,7 +1,7 @@
 import pygame
 import math
 from pygame.locals import *
-from Road import Road
+from src.Road import Road
 
 class DisplayController:
 
