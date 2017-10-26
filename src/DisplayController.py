@@ -76,6 +76,9 @@ class DisplayController:
 
         for road in traffic_map.roadlist:
             self.drawRoad(road)
+            for vehicle in road.vehicles:
+                self.drawVehicle(road, vehicle)
+
         temp_surface = pygame.transform.scale(self.draw_surface,tuple(map(int, self.display_zoom)))
         self.display_surface.blit(temp_surface, temp_surface.get_rect().move(self.xoffset, self.yoffset))
 
@@ -129,6 +132,15 @@ class DisplayController:
                   second[1] + (third[1] - second[1]) * road.inbound_lanes / (road.inbound_lanes + road.outbound_lanes))
 
         pygame.draw.line(self.draw_surface, Color(250, 210, 1), point1, point2, 3)
+
+    def drawIntersection(self, intersection):
+        """
+        :param intersection: instance of intersection to draw
+        :type intersection: Intersection
+        :return:
+        """
+        road_color = Color(100,100,100)
+        pygame.draw.circle(self.draw_surface, road_color, intersection.center, intersection.radius)
 
 
 
