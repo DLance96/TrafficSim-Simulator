@@ -1,6 +1,7 @@
 import math
 from collections import defaultdict
 from shapely import geometry
+from Bucket import Bucket
 """
 TODO:
 add tick method s.t. calling tick will advance the simulation 1 tick
@@ -35,7 +36,7 @@ class Road:
                                           road_width = self.width,
                                           bucket_length = self.bucket_length,
                                           inbound_lanes = self.inbound_lanes,
-                                          outbound_lanes = self.outbond_lanes)
+                                          outbound_lanes = self.outbound_lanes)
         self.surface = self.generate_surface()
         self.next_locations = [] # Prevents conflicts with cars being moved onto roads between tick and tock.
 
@@ -65,7 +66,7 @@ class Road:
         for i in range(number_of_buckets):
 
             if i == 0:
-                head = Bucket(intial_x = i * self.bucket_length, length=bucket_length,
+                head = Bucket(initial_x = i * self.bucket_length, length=bucket_length,
                               inbound_lanes=inbound_lanes, outbound_lanes=outbound_lanes)
                 tail = head
                 bucket_list.append(head)
@@ -85,7 +86,7 @@ class Road:
         first = self.anchor
         second = [first[0] + self.length * math.cos(self.orientation), first[1] + self.length * math.sin(self.orientation)]
         third = [second[0] + self.width * math.cos(self.orientation + math.pi / 2), second[1] + self.width * math.sin(self.orientation + math.pi / 2)]
-        fourth = [first[0] + self.width * math.cos(self.orientation + math.pi / 2), first[1] + self.diwth * math.sin(self.orientation + math.pi / 2)]
+        fourth = [first[0] + self.width * math.cos(self.orientation + math.pi / 2), first[1] + self.width * math.sin(self.orientation + math.pi / 2)]
         # Reference : https://toblerity.org/shapely/manual.html#polygons
         return geometry.Polygon([first, second, third, fourth])
 
