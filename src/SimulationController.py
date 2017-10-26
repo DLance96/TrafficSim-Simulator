@@ -66,9 +66,10 @@ class SimulationController:
         """
         :return: None
         """
+        self.traffic_map.tick(self.ticktime_ms)
 
     def tock(self):
         """
         :return: None
         """
-
+        self.traffic_map.tock(self.ticktime_ms)
