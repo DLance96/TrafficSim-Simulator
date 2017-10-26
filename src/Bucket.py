@@ -164,8 +164,10 @@ class Bucket:
         if self.number_of_vehicles == 0:
             # Process of becoming dead
             self.alive = False
-            self.previous_alive_bucket.set_next_alive_bucket(self.next_alive_bucket)
-            self.next_alive_bucket.set_previous_alive_bucket(self.previous_alive_bucket)
+            if self.previous_alive_bucket is not None:
+                self.previous_alive_bucket.set_next_alive_bucket(self.next_alive_bucket)
+            if self.next_alive_bucket is not None:
+                self.next_alive_bucket.set_previous_alive_bucket(self.previous_alive_bucket)
             self.next_alive_bucket = None
             self.previous_alive_bucket = None
 
