@@ -1,4 +1,4 @@
-class BasicDriver:
+class DriverTemplate:
 
     def __init__(self):
         # over_breaking defines by what percentage driver will over compensate in breaking

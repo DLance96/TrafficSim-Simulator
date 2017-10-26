@@ -1,4 +1,4 @@
-class StandardCar:
+class VehicleTemplate:
     def __init__(self):
 
         # length of vehicle
