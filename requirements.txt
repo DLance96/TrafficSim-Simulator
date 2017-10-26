@@ -4,3 +4,4 @@ PyQt5==5.9
 pytest==3.2.2
 sip==4.19.3
 shapely==1.6.1
+Pygame==1.9.3
