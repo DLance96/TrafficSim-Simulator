@@ -154,23 +154,7 @@ class Intersection:
         :return:
         """
 
-        locations = [vehicle.get_location() for vehicle in self.vehicles]
-
-        for vehicle_index in self.list_duplicates(locations):
-            self.vehicles[vehicle_index].crash()
-
         return
-
-    def list_duplicates(self, seq):
-        """
-        Helper method for process_collisions
-        :param seq:
-        :return:
-        """
-        tally = defaultdict(list)
-        for i, item in enumerate(seq):
-            tally[item].append(i)
-        return ((key, locs) for key, locs in tally.items() if len(locs) > 1)
 
     def spawn(self, vehicle_template, driver_template, direction):
         """

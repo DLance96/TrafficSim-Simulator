@@ -259,24 +259,7 @@ class Road:
         :return:
         """
 
-        locations = [vehicle.get_location() for vehicle in self.vehicles]
-        # Actually need to get the actual sizes of cars to figure out if they have collided
-
-        for vehicle_index in self.list_duplicates(locations):
-            self.vehicles[vehicle_index].crash()
-
         return
-
-    def list_duplicates(self, seq):
-        """
-        Helper method for process_collisions
-        :param seq:
-        :return:
-        """
-        tally = defaultdict(list)
-        for i, item in enumerate(seq):
-            tally[item].append(i)
-        return ((key, locs) for key, locs in tally.items() if len(locs) > 1)
 
     def spawn(self, vehicle_template, driver_template, direction):
         """
@@ -289,24 +272,44 @@ class Road:
         :return:
         """
 
-        nearby_vehicles = self.bucket_list[0].get_vehicles()
         vehicle_length = vehicle_template.length
-        clear = True
-        # If the created vehicle were be adjacent to any vehicle, we don't want to spawn it
-        # Later we could replace this with a direct collision check
-        for vehicle in nearby_vehicles:
-            if vehicle.get_location() - vehicle.get_cartype().length / 2 <= vehicle_length:
-                clear = False
 
-        if clear:
-            # Pick a y location corresponding to the center of a random outbound lane
-            y = (random.randint(0, self.outbound_lanes - 1) + .5) * self.lane_width
-            # Pick an x location so that the car is just fully on the road
-            x = vehicle_length / 2
-            spawned_vehicle = Vehicle(self, x=x, y=y, vx=.1, vy=0, orientation= self.orientation,
-                                      cartype=vehicle_template, drivertype=driver_template)
-            # Accepts a transfer from nowhere, kinda silly. Maybe rename accept_transfer for clarity?
-            self.accept_transfer(spawned_vehicle, self.local_to_global_location_conversion((x, y)))
+        if direction == "outbound":
+
+            clear = True
+
+            # TODO
+            # Some sort of check is necessary to make sure a car is not spawned on another car.
+
+            if clear:
+                # Pick a y location corresponding to the center of a random outbound lane
+                y = (random.randint(0, self.outbound_lanes - 1) + .5) * self.lane_width
+                # Pick an x location so that the car is just fully on the road
+                x = vehicle_length / 2
+                spawned_vehicle = Vehicle(self, x=x, y=y, vx=.1, vy=0, orientation= self.orientation,
+                                          cartype=vehicle_template, drivertype=driver_template)
+                # Accepts a transfer from nowhere, kinda silly. Maybe rename accept_transfer for clarity?
+                self.accept_transfer(spawned_vehicle, self.local_to_global_location_conversion((x, y)))
+        elif direction == "inbound":
+
+            clear = True
+
+            # TODO
+            # Some sort of check is necessary to make sure a car is not spawned on another car.
+
+            if clear:
+                # Pick a y location corresponding to the center of a random outbound lane
+                y = self.outbound_lanes * self.lane_width + (random.randint(0, self.inbound_lanes - 1) + .5) * self.lane_width
+                # Pick an x location so that the car is just fully on the road
+                x = self.length - vehicle_length / 2
+                spawned_vehicle = Vehicle(self, x=x, y=y, vx=-.1, vy=0, orientation= self.orientation + 2 * math.pi,
+                                          cartype=vehicle_template, drivertype=driver_template)
+                # Accepts a transfer from nowhere, kinda silly. Maybe rename accept_transfer for clarity?
+                self.accept_transfer(spawned_vehicle, self.local_to_global_location_conversion((x, y)))
+
+        else:
+            raise ValueError("Vehicles must be travelling inbound or outbound.")
+
 
         return
 
