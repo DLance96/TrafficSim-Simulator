@@ -2,11 +2,7 @@ import math
 from collections import defaultdict
 from shapely import geometry
 from Bucket import Bucket
-"""
-TODO:
-add tick method s.t. calling tick will advance the simulation 1 tick
-implement Bucket list iterator
-"""
+
 class Road:
 
     lane_width = 10
@@ -41,24 +37,47 @@ class Road:
         self.next_locations = [] # Prevents conflicts with cars being moved onto roads between tick and tock.
 
     def tick(self, ticktime_ms):
+        """
+        Performs the vehicle next location getting tick
+        :param ticktime_ms:
+        :return:
+        """
 
         self.next_locations = self.request_next_locations(ticktime_ms)
 
         return
 
     def tock_positions(self):
+        """
+        Performs the vehicle position updating tock
+        :return:
+        """
 
         self.update_positions()
 
         return
 
     def tock_crashes(self):
+        """
+        Performs the crash detecting and handling tock
+        :return:
+        """
 
         self.process_collisions()
 
         return
 
     def initialize_buckets(self, road_length, road_width, bucket_length, inbound_lanes, outbound_lanes):
+        """
+        Creates a list of buckets of length equal to 10 seconds of travel at the speed limit
+        to populate the length of the road.
+        :param road_length:
+        :param road_width:
+        :param bucket_length:
+        :param inbound_lanes:
+        :param outbound_lanes:
+        :return:
+        """
 
         number_of_buckets = math.ceil(road_length / bucket_length)
         bucket_list = []
@@ -81,6 +100,10 @@ class Road:
         return bucket_list
 
     def generate_surface(self):
+        """
+        Generates the shapely Polygon storing the surface of the road.
+        :return:
+        """
         # Points proceed clockwise around the rectangle from the anchor point
         # [x, y] formatting
         first = self.anchor
@@ -90,22 +113,38 @@ class Road:
         # Reference : https://toblerity.org/shapely/manual.html#polygons
         return geometry.Polygon([first, second, third, fourth])
 
-    # Produces the next intended location of each car.
     def request_next_locations(self, ticktime_ms):
+        """
+        Produces the next intended location of each car.
+        :param ticktime_ms:
+        :return:
+        """
         next_locations = [[vehicle.get_intended_position(ticktime_ms), vehicle] for vehicle in self.vehicles]
         return next_locations
 
-    # Takes a local coordinate and returns whether or not it is on the road
     def is_local_on_road(self, location):
+        """
+        Takes a local coordinate and returns whether or not it is on the road
+        :param location:
+        :return:
+        """
         location = self.local_to_global_location_conversion(location)
         return self.surface.contains(geometry.Point(location[0], location[1]))
 
-    # Takes a global coordinate and returns whether or not it is on the road
     def is_global_on_road(self, location):
+        """
+        Takes a global coordinate and returns whether or not it is on the road
+        :param location:
+        :return:
+        """
         return self.surface.contains(geometry.Point(location[0], location[1]))
 
     def local_to_global_location_conversion(self, location):
-        """Turn a local coordinate into its corresponding global coordinate"""
+        """
+        Turn a local coordinate into its corresponding global coordinate
+        :param location:
+        :return:
+        """
 
         x = self.anchor[0] + location[0] * math.cos(self.orientation) + location[1] * math.cos(self.orientation + math.pi / 2)
         y = self.anchor[1] + location[0] * math.sin(self.orientation) + location[1] * math.sin(self.orientation + math.pi / 2)
@@ -113,7 +152,11 @@ class Road:
         return [x, y]
 
     def global_to_local_location_conversion(self, location):
-        """Turn a global coordinate into its corresponding local coordinate"""
+        """
+        Turn a global coordinate into its corresponding local coordinate
+        :param location:
+        :return:
+        """
 
         # Recenter so that the anchor is the origin
         relative_x = location[0] - self.anchor[0]
@@ -124,8 +167,12 @@ class Road:
 
         return [local_x, local_y]
 
-    # Takes a global coordinate and returns which, if any of the neighboring intersections contains that coordinate
     def which_neighbor(self, location):
+        """
+        akes a global coordinate and returns which, if any of the neighboring intersections contains that coordinate
+        :param location:
+        :return:
+        """
 
         if self.initial_intersection.is_global_in_intersection(self.local_to_global_location_conversion(location)):
             return self.initial_intersection
@@ -135,8 +182,13 @@ class Road:
             raise ValueError("No neighbor contains that location.")
             return
 
-    # Takes a vehicle and a global location and attempts to relocate the vehicle to that location
     def transfer(self, vehicle, location):
+        """
+        Takes a vehicle and a global location and attempts to relocate the vehicle to that location
+        :param vehicle:
+        :param location:
+        :return:
+        """
 
         try:
             neighbor = self.which_neighbor(location)
@@ -147,6 +199,13 @@ class Road:
         return
 
     def accept_transfer(self, vehicle, location):
+        """
+        Takes a vehicle and a global coordinate and places the vehicle onto the road at the local coordinate
+        corresponding to the global coordinate
+        :param vehicle:
+        :param location:
+        :return:
+        """
 
         local_location = self.global_to_local_location_conversion(location)
         vehicle.transfer_to_road(self, local_location)
@@ -156,8 +215,13 @@ class Road:
         return
 
 
-    # Takes a vehicle and a local location and ensures that the vehicle is in the bucket corresponding to the location
     def appropriately_bucket(self, vehicle, location):
+        """
+        Takes a vehicle and a local location and ensures that the vehicle is in the bucket corresponding to the location
+        :param vehicle:
+        :param location:
+        :return:
+        """
 
         # Remove the vehicle from its current bucket
         vehicle.get_bucket().remove(vehicle)
@@ -187,6 +251,10 @@ class Road:
 
     # Thought about doing this bucket-wise, but can't. Vehicle can be in more than 1 bucket.
     def process_collisions(self):
+        """
+        Locates those vehicles which have been in a collision and informs them of that fact.
+        :return:
+        """
 
         locations = [vehicle.get_location() for vehicle in self.vehicles]
 
@@ -195,17 +263,35 @@ class Road:
 
         return
 
-    # Helper method for process_collisions
     def list_duplicates(self, seq):
+        """
+        Helper method for process_collisions
+        :param seq:
+        :return:
+        """
         tally = defaultdict(list)
         for i, item in enumerate(seq):
             tally[item].append(i)
         return ((key, locs) for key, locs in tally.items() if len(locs) > 1)
 
     def spawn(self, vehicle_template, driver_template, direction):
+        """
+        Takes the necessary inputs to generate a vehicle and generates the corresponding vehicles on a
+        random lane at x = 0 driving outbound
+        :param vehicle_template:
+        :param driver_template:
+        :param direction:
+        :return:
+        """
         return
 
     def add_neighboring_intersection(self, intersection, end):
+        """
+        Takes an intersection and an associated end of the road and adds that intersection at that road.
+        :param intersection:
+        :param end:
+        :return:
+        """
         if end == "initial":
             self.initial_intersection = intersection
         elif end == "terminal":
@@ -213,12 +299,3 @@ class Road:
         else:
             raise ValueError("Intersection added to an end other than 'initial' or 'terminal'")
         return
-
-
-
-class Bucket_Iterator:
-    """
-    TODO:
-    add getnext() (which also iterates to the next vehicle)
-    getnext returns Null if there are no vehicle left
-    """
