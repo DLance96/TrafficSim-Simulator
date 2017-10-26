@@ -10,7 +10,7 @@ class DisplayController:
         Initializes DisplayController
         """
         pygame.init()
-        self.display_size = 640, 400
+        self.display_size = 1200, 800
         self.display_surface = pygame.display.set_mode(self.display_size, pygame.HWSURFACE | pygame.DOUBLEBUF)
         self.draw_surface = pygame.Surface(self.display_size)
 
@@ -24,7 +24,7 @@ class DisplayController:
         :type keys_down: list(bool)
         :return: None
         """
-        move_interval = 1
+        move_interval = int(10*self.display_size[0]/self.display_zoom[0])
         scale_factor = 100
         if keys_down[pygame.K_LEFT]:
             self.xoffset += move_interval
@@ -39,18 +39,18 @@ class DisplayController:
             self.yoffset -= move_interval
 
         if keys_down[pygame.K_q]:
-            self.display_zoom = (self.display_zoom[0] + self.display_size[0]/scale_factor),\
-                                (self.display_zoom[1] + self.display_size[1]/scale_factor)
-            self.xoffset -= self.display_size[0] / scale_factor / 2
-            self.yoffset -= self.display_size[1] / scale_factor / 2
+            self.display_zoom = (self.display_zoom[0]*1.01),\
+                                (self.display_zoom[1]*1.01)
+            #self.xoffset -= self.display_size[0] / scale_factor / 2
+            #self.yoffset -= self.display_size[1] / scale_factor / 2
 
         if keys_down[pygame.K_w]:
             if self.display_zoom[0] > 100:
-                self.display_zoom = (self.display_zoom[0] - self.display_size[0]/scale_factor),\
-                                    (self.display_zoom[1] - self.display_size[1]/scale_factor)
+                self.display_zoom = (self.display_zoom[0]/1.01),\
+                                    (self.display_zoom[1]/1.01)
 
-                self.xoffset += self.display_size[0] / scale_factor / 2
-                self.yoffset += self.display_size[1] / scale_factor / 2
+                #self.xoffset += self.display_size[0] / scale_factor / 2
+                #self.yoffset += self.display_size[1] / scale_factor / 2
 
     def render(self, traffic_map):
         """
