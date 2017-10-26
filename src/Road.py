@@ -3,6 +3,7 @@ import random
 from collections import defaultdict
 from shapely import geometry
 from Bucket import Bucket
+from Vehicle import Vehicle
 
 class Road:
 
@@ -224,8 +225,9 @@ class Road:
         :return:
         """
 
-        # Remove the vehicle from its current bucket
-        vehicle.get_bucket().remove(vehicle)
+        # Remove the vehicle from its current bucket if it exists
+        if vehicle.get_bucket() is not None:
+            vehicle.get_bucket().remove(vehicle)
         # And place it into the new bucket in which it belongs
         bucket = self.bucket_list[math.floor(location[0] / self.bucket_length)]
         bucket.add(vehicle)
@@ -287,7 +289,7 @@ class Road:
         :return:
         """
 
-        nearby_vehicles = bucket_list[0].first_bucket.get_vehicles()
+        nearby_vehicles = self.bucket_list[0].get_vehicles()
         vehicle_length = vehicle_template.length
         clear = True
         # If the created vehicle were be adjacent to any vehicle, we don't want to spawn it
