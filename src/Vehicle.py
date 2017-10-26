@@ -21,7 +21,7 @@ class Vehicle:
         :param y: float
         :param vx: float
         :param vy: float
-        :param orientation: int
+        :param orientation: double
         :param cartype:
         """
         self.x = x
