@@ -207,7 +207,7 @@ class Road:
     def add_neighboring_intersection(self, intersection, end):
         if end == "initial":
             self.initial_intersection = intersection
-        elif end = "terminal":
+        elif end == "terminal":
             self.terminal_intersection = intersection
         else:
             raise ValueError("Intersection added to an end other than 'initial' or 'terminal'")

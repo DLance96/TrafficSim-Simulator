@@ -1,6 +1,5 @@
 import math
 from collections import defaultdict
-from shapely import geometry
 """
 TODO:
 add tick method s.t. calling tick will advance the simulation 1 tick
@@ -151,11 +150,6 @@ class Road:
     def spawn(self, vehicle_template, driver_template, direction):
         return
 
-    def add_neighboring_intersection(self, intersection, end):
-        if end == "initial":
-            self.initial_intersection = intersection
-        elif end = "terminal":
-            self.terminal_intersection = intersection
-        else:
-            raise ValueError("Intersection added to an end other than 'initial' or 'terminal'")
+    def add_neighboring_road(self, road, end):
+
         return
