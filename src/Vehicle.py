@@ -33,6 +33,7 @@ class Vehicle:
         self.orientation = orientation
         self.ticktime_ms = ticktime_ms
         self.road = road
+        self.intersection = None
         self.vehicle_neigbors = self.VehicleNeighbors()
         self.cartype = cartype
         self.drivertype = drivertype
@@ -46,6 +47,22 @@ class Vehicle:
         :return: tuple
         """
         return self.x + self.vx * time_ahead, self.y + self.vy * time_ahead
+
+    # Takes a road and a local location and sets the car to being on that road at that location
+    def transfer_to_road(self, road, location):
+        self.road = road
+        self.intersection = None
+        self.x = location[0]
+        self.y = location[1]
+        return
+
+    # Takes an intersection and a local location and sets the car to being in that intersection at that location
+    def transfer_to_intersection(self, intersection, location):
+        self.road = None
+        self.intersection = intersection
+        self.x = location[0]
+        self.y = location[1]
+        return
 
     def get_time_until_collision(self, vehicle):
         if vehicle.vx == self.vx:

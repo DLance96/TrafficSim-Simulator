@@ -1,0 +1,155 @@
+import math
+from collections import defaultdict
+"""
+TODO:
+add tick method s.t. calling tick will advance the simulation 1 tick
+implement Bucket list iterator
+"""
+class Road:
+
+    lane_width = 10
+
+    def __init__(self, center, radius, speed_limit):
+        """
+        :param anchor_corner: [double, double]
+        :param length: double
+        :param inbound_lanes: int
+        :param outbound_lanes: int
+        :param orientatino: double (IN RADIANS!)
+        :param speed_limit: int
+        """
+        self.center = center
+        self.radius = radius
+        self.speed_limit = speed_limit
+        self.vehicles = []
+        self.adjacent_roads = []
+        self.adjacent_road_orientations = []
+        self.adjacent_road_widths = []
+        self.next_locations = [] # Prevents conflicts with cars being moved onto roads between tick and tock.
+
+    def tick(self, ticktime_ms):
+
+        self.next_locations = self.request_next_locations(ticktime_ms)
+
+        return
+
+    def tock_positions(self):
+
+        self.update_positions()
+
+        return
+
+    def tock_crashes(self):
+
+        self.process_collisions()
+
+        return
+
+    # Produces the next intended location of each car.
+    def request_next_locations(self, ticktime_ms):
+        next_locations = [[vehicle.get_intended_position(ticktime_ms), vehicle] for vehicle in self.vehicles]
+        return next_locations
+
+    # Takes a local coordinate and returns whether or not it is on the road
+    def is_local_in_intersection(self, location):
+        # Checking if something is in a circle centered at the origin is so pleasant
+        result = (math.sqrt(math.pow(location[0], 2) + math.pow(location[1], 2)) < self.radius)
+        return result
+
+    # Takes a global coordinate and returns whether or not it is on the road
+    def is_global_on_road(self, location):
+        recast = [location[0] - self.center[0], location[1] - self.center[1]]
+        result = (math.sqrt(math.pow(recast[0], 2) + math.pow(recast[1], 2)) < self.radius)
+        return result
+
+    def local_to_global_location_conversion(self, location):
+        """Turn a local coordinate into its corresponding global coordinate"""
+        return [location[0] + self.center[0], location[1] + self.center[1]]
+
+    def global_to_local_location_conversion(self, location):
+        """Turn a global coordinate into its corresponding local coordinate"""
+        return [location[0] - self.center[0], location[1] - self.center[1]]
+
+    # I love circles so much. They are my best friends. -P
+
+    # Takes a global coordinate and returns which, if any of the neighboring roads contains that coordinate
+    def which_neighbor(self, location):
+
+        for road in self.adjacent_roads:
+            if road.is_global_on_road(location):
+                return road
+        raise ValueError("No neighbor contains that location.")
+
+    # Takes a vehicle and a global location and attempts to relocate the vehicle to that location
+    def transfer(self, vehicle, location):
+
+        try:
+            neighbor = self.which_neighbor(location)
+            neighbor.accept_transfer(vehicle, location)
+        except ValueError:
+            raise ValueError("A vehicle couldn't be transferred because it requested an invalid destination.")
+
+        return
+
+    def accept_transfer(self, vehicle, location):
+
+        local_location = self.global_to_local_location_conversion(location)
+        vehicle.transfer_to_road(self, local_location)
+        self.appropriately_bucket(vehicle, local_location)
+        self.vehicles.append(vehicle)
+
+        return
+
+
+    # Takes a vehicle and a local location and ensures that the vehicle is in the bucket corresponding to the location
+    def appropriately_bucket(self, vehicle, location):
+
+        # Remove the vehicle from its current bucket
+        vehicle.get_bucket().remove(vehicle)
+        # And place it into the new bucket in which it belongs
+        bucket = self.bucket_list[math.floor(location[0] / self.bucket_length)]
+        bucket.add(vehicle)
+        # And inform the vehicle which bucket it is now in
+        vehicle.set_bucket(bucket)
+
+        return
+
+    def update_positions(self):
+
+        # Update the location of each vehicle by updating it directly or transferring it to a neighboring intersection
+        for intended_location, vehicle in self.next_locations:
+            if self.is_local_on_road(intended_location):
+                vehicle.update_location(intended_location[0], intended_location[1])
+                self.appropriately_bucket(vehicle, intended_location)
+            else:
+                global_location = self.local_to_global_location_conversion(intended_location)
+                self.transfer(vehicle, global_location)
+
+        # Reset the list of cars intending to move
+        self.next_locations = []
+
+        return
+
+    # Thought about doing this bucket-wise, but can't. Vehicle can be in more than 1 bucket.
+    def process_collisions(self):
+
+        locations = [vehicle.get_location() for vehicle in self.vehicles]
+
+        for vehicle_index in self.list_duplicates(locations):
+            self.vehicles[vehicle_index].crash()
+
+        return
+
+    # Helper method for process_collisions
+    def list_duplicates(self, seq):
+        tally = defaultdict(list)
+        for i, item in enumerate(seq):
+            tally[item].append(i)
+        return ((key, locs) for key, locs in tally.items() if len(locs) > 1)
+
+    def spawn(self, vehicle_template, driver_template, direction):
+        return
+
+    def add_neighboring_road(self, road, end):
+
+        return
