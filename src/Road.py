@@ -306,7 +306,7 @@ class Road:
             spawned_vehicle = Vehicle(self, x=x, y=y, vx=0, vy=0, orientation=self.orientation,
                                       cartype=vehicle_template, drivertype=driver_template)
             # Accepts a transfer from nowhere, kinda silly. Maybe rename accept_transfer for clarity?
-            self.accept_transfer(spawned_vehicle, (x, y))
+            self.accept_transfer(spawned_vehicle, self.local_to_global_location_conversion((x, y)))
 
         return
 
