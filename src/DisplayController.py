@@ -97,7 +97,9 @@ class DisplayController:
         :param vehicle:
         :return: None
         """
-        first = (vehicle.x, vehicle.y)
+        first = (vehicle.x - vehicle.cartype.width / 2 * math.cos(vehicle.orientation + math.pi / 2),
+                 vehicle.y - vehicle.cartype.width / 2 * math.sin(vehicle.orientation + math.pi / 2))
+        
         second = (first[0] + vehicle.cartype.length * math.cos(vehicle.orientation),
                   first[1] + vehicle.cartype.length * math.sin(vehicle.orientation))
 
