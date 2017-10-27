@@ -39,7 +39,6 @@ class TrafficMap:
 
             self.roadlist[i].tick(ticktime_ms)
 
-
         for i in range(len(self.intersectionlist)):
             self.intersectionlist[i].tick(ticktime_ms)
 
