@@ -1,7 +1,7 @@
 import time
-
 from src.vehicles.VehicleTemplate import VehicleTemplate
 from src.drivers.DriverTemplate import DriverTemplate
+import math
 
 
 class Vehicle:
@@ -61,6 +61,41 @@ class Vehicle:
         """
         return (self.x, self.y)
 
+    def get_bounding_points(self):
+        """
+        Computes and returns the four points on the corners of the vehicle.
+        Used for collision detection.
+        :return:
+        """
+
+        location = (self.x, self.y)
+        # Compute the points at the origin with orientation 0, then rotate by orientation, then shift by location
+        p1 = location + self.rotate_around_origin(-self.cartype.length / 2, -self.cartype.width / 2,
+                                                  self.orientation)
+        p2 = location + self.rotate_around_origin(self.cartype.length / 2, -self.cartype.width / 2,
+                                                  self.orientation)
+        p3 = location + self.rotate_around_origin(self.cartype.length / 2, self.cartype.width / 2,
+                                                  self.orientation)
+        p4 = location + self.rotate_around_origin(-self.cartype.length / 2, self.cartype.width / 2,
+                                                  self.orientation)
+
+        return (p1, p2, p3, p4)
+
+    def max_offset(self):
+        """
+        The largest distance of any point on the vehicle from the location of the vehicle.
+        Used to shortcut collision detection.
+        :return:
+        """
+
+        return math.sqrt(math.pow(self.cartype.width / 2, 2) + math.pow(self.cartype.length / 2, 2))
+
+    def rotate_around_origin(self, x, y, radians):
+
+        rot_x = x * math.cos(radians) - y * math.sin(radians)
+        rot_y = y * math.cos(radians) + x * sin(radians)
+
+        return (x, y)
 
     def get_intended_position(self, time_ahead):
         """
