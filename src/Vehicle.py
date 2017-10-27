@@ -12,6 +12,8 @@ class Vehicle:
         def __init__(self):
             self.last_update_time_ms = 0
             self.nearby_vehicles = []
+            self.vehicles_behind = []
+            self.vehicles_infront = []
 
     def __init__(self, road, x=0, y=0, vx=0, vy=0, orientation=0, cartype=VehicleTemplate(), drivertype=DriverTemplate()):
         """
@@ -129,9 +131,9 @@ class Vehicle:
         if vehicle.vy == self.vy:
             return -1
 
-        time_untilx = (self.x - vehicle.x) / (vehicle.vx - self.vx)
+        time_untilx = abs(self.x - vehicle.x) / abs(vehicle.vx - self.vx)
 
-        time_untily = (self.y - vehicle.y) / (vehicle.vy - self.vy)
+        time_untily = abs(self.y - vehicle.y) / abs(vehicle.vy - self.vy)
 
         if time_untilx > 0 and time_untily > 0 and abs(time_untilx - time_untily) < 2:
             return min(time_untilx, time_untily)
@@ -148,6 +150,12 @@ class Vehicle:
         for vehicle in self.vehicle_neigbors.nearby_vehicles:
             brake_decel += self.respond_vehicle_brake(vehicle)
 
+        for vehicle in self.vehicle_neigbors.vehicles_infront:
+            brake_decel += self.respond_vehicle_brake(vehicle)
+
+        for vehicle in self.vehicle_neigbors.vehicles_behind:
+            brake_decel += self.respond_vehicle_brake(vehicle)
+
         brake_decel = min(brake_decel, self.cartype.max_brake_decel)
 
         if brake_decel > 0:
@@ -162,16 +170,18 @@ class Vehicle:
 
         return self.x + self.vx * ticktime_ms / 1000, self.y + self.vy * ticktime_ms / 1000
 
-    def update_vehicle_neighbors(self, nearby_vehicles):
+    def update_vehicle_neighbors(self, nearby_vehicles, vehicles_behind, vehicles_infront):
         """
         :param nearby_vehicles: Vehicle list
         must have the car in front inside this list to properly respond
         called from Road
         :return: None
         """
-        if nearby_vehicles.last_update_time_ms < int(time.time() * 1000):
-            self.nearby_vehicles.nearby_vehicles = nearby_vehicles
-            self.nearby_vehicles.last_update_time_ms = int(time.time() * 1000)
+        if self.vehicle_neigbors.last_update_time_ms < int(time.time() * 1000):
+            self.vehicle_neigbors.nearby_vehicles = nearby_vehicles
+            self.vehicle_neigbors.vehicles_behind = vehicles_behind
+            self.vehicle_neigbors.vehicles_infront = vehicles_infront
+            self.vehicle_neigbors.last_update_time_ms = int(time.time() * 1000)
 
     def update_location(self, x, y):
         """
@@ -191,13 +201,10 @@ class Vehicle:
         returns float
         deceleration along x
         """
-        if self.vx > other_vehicle.vx and self.x <= other_vehicle.x:
-            timeuntil = self.get_time_until_collision(other_vehicle)
-            if timeuntil <= self.drivertype.following_time:
-                print("Braking")
-
-                return min((self.vx - other_vehicle.vx) / timeuntil, self.drivertype.max_break_decel)
-
+        timeuntil = self.get_time_until_collision(other_vehicle)
+        if timeuntil <= self.drivertype.following_time and timeuntil > 0:
+            print(timeuntil)
+            return min((self.vx - other_vehicle.vx) / timeuntil, self.drivertype.max_break_decel)
 
         else:
             return 0
