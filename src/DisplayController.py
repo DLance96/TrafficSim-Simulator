@@ -106,8 +106,9 @@ class DisplayController:
             avgx += point[0] / len(pointlist)
             avgy += point[1] / len(pointlist)
 
-        pygame.draw.circle(self.draw_surface, vehicle.drivertype.color, (int(avgx), int(avgy)), int(vehicle.cartype.width/2))
         pygame.draw.polygon(self.draw_surface, vehicle.cartype.color, pointlist)
+        pygame.draw.circle(self.draw_surface, vehicle.drivertype.color, (int(avgx), int(avgy)), int(vehicle.cartype.width/2))
+
 
     def drawRoad(self, road):
         """
