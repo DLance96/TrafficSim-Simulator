@@ -92,7 +92,7 @@ class Road:
                 tail = head
                 bucket_list.append(head)
             else:
-                next = Bucket(intial_x = i * self.bucket_length, length=bucket_length,
+                next = Bucket(initial_x = i * self.bucket_length, length=bucket_length,
                               inbound_lanes=inbound_lanes, outbound_lanes=outbound_lanes)
                 next.set_previous_bucket(tail)
                 tail.set_next_bucket(next)
@@ -121,7 +121,7 @@ class Road:
         :param ticktime_ms:
         :return:
         """
-        next_locations = [[vehicle.get_intended_position(ticktime_ms), vehicle] for vehicle in self.vehicles]
+        next_locations = [[vehicle.compute_next_location(ticktime_ms), vehicle] for vehicle in self.vehicles]
         return next_locations
 
     def is_local_on_road(self, location):

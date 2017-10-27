@@ -102,7 +102,7 @@ class Vehicle:
 
         return -1
 
-    def compute_next_location(self):
+    def compute_next_location(self, ticktime_ms):
         """
         called by the road to update the cars intended positions
         TODO: update method to allow smooth acceleration in traffic
@@ -120,11 +120,11 @@ class Vehicle:
             if self.road.speed_limit > self.vx:
                 self.ax = min((self.road.speed_limit - self.vx) / self.drivertype.accel_time, self.drivertype.max_accel)
 
-        self.vx += self.ax * self.ticktime_ms / 1000
+        self.vx += self.ax * ticktime_ms / 1000
 
-        self.vy += self.ay * self.ticktime_ms / 1000
+        self.vy += self.ay * ticktime_ms / 1000
 
-        return (self.x + self.vx * self.ticktime_ms / 1000, self.y + self.vy * self.ticktime_ms / 1000)
+        return (self.x + self.vx * ticktime_ms / 1000, self.y + self.vy * ticktime_ms / 1000)
 
     def update_vehicle_neighbors(self, nearby_vehicles):
         """
