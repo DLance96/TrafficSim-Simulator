@@ -1,5 +1,6 @@
 import math
 import random
+import time
 from collections import defaultdict
 from shapely import geometry
 from src.Bucket import Bucket
@@ -125,6 +126,19 @@ class Road:
         :param ticktime_ms:
         :return:
         """
+        current_time = time.time()*1000
+        for bucket in self.bucket_list:
+            for vehicle in bucket.vehicles:
+                behind = []
+                infront = []
+                if bucket.get_previous_alive_bucket() is not None:
+                    behind = bucket.get_previous_alive_bucket().vehicles
+                if bucket.get_next_alive_bucket() is not None:
+                    infront = bucket.get_next_alive_bucket().vehicles
+                vehicle.update_vehicle_neighbors(bucket.vehicles, behind, infront)
+
+
+
         next_locations = [[vehicle.compute_next_location(ticktime_ms), vehicle] for vehicle in self.vehicles]
         return next_locations
 
