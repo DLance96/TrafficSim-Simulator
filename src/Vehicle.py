@@ -1,4 +1,5 @@
 import time
+import operator
 from src.vehicles.VehicleTemplate import VehicleTemplate
 from src.drivers.DriverTemplate import DriverTemplate
 import math
@@ -70,14 +71,14 @@ class Vehicle:
 
         location = (self.x, self.y)
         # Compute the points at the origin with orientation 0, then rotate by orientation, then shift by location
-        p1 = location + self.rotate_around_origin(-self.cartype.length / 2, -self.cartype.width / 2,
-                                                  self.orientation)
-        p2 = location + self.rotate_around_origin(self.cartype.length / 2, -self.cartype.width / 2,
-                                                  self.orientation)
-        p3 = location + self.rotate_around_origin(self.cartype.length / 2, self.cartype.width / 2,
-                                                  self.orientation)
-        p4 = location + self.rotate_around_origin(-self.cartype.length / 2, self.cartype.width / 2,
-                                                  self.orientation)
+        p1 = tuple(map(operator.add, location, self.rotate_around_origin(-self.cartype.length / 2, -self.cartype.width / 2,
+                                                  self.orientation)))
+        p2 = tuple(map(operator.add, location, self.rotate_around_origin(self.cartype.length / 2, -self.cartype.width / 2,
+                                                  self.orientation)))
+        p3 = tuple(map(operator.add, location, self.rotate_around_origin(self.cartype.length / 2, self.cartype.width / 2,
+                                                  self.orientation)))
+        p4 = tuple(map(operator.add, location, self.rotate_around_origin(-self.cartype.length / 2, self.cartype.width / 2,
+                                                  self.orientation)))
 
         return (p1, p2, p3, p4)
 
@@ -93,9 +94,9 @@ class Vehicle:
     def rotate_around_origin(self, x, y, radians):
 
         rot_x = x * math.cos(radians) - y * math.sin(radians)
-        rot_y = y * math.cos(radians) + x * sin(radians)
+        rot_y = y * math.cos(radians) + x * math.sin(radians)
 
-        return (x, y)
+        return (rot_x, rot_y)
 
     def get_intended_position(self, time_ahead):
         """
