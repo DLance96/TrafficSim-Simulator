@@ -153,7 +153,7 @@ class Vehicle:
         if brake_decel > 0:
             self.ax = -brake_decel
         else:
-            if self.road.speed_limit > self.vx:
+            if self.road.speed_limit + self.drivertype.speeding_offset > self.vx:
                 self.ax = min((self.road.speed_limit - self.vx) / self.drivertype.accel_time, self.drivertype.max_accel)
 
         self.vx += self.ax * ticktime_ms / 1000

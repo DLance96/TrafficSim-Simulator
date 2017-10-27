@@ -100,8 +100,14 @@ class DisplayController:
 
         pointlist = list(map(road.local_to_global_location_conversion, vehicle.get_bounding_points()))
 
-        vehicle_color = vehicle.drivertype.color
-        pygame.draw.polygon(self.draw_surface, vehicle_color, pointlist)
+        avgx = 0
+        avgy = 0
+        for point in pointlist:
+            avgx += point[0] / len(pointlist)
+            avgy += point[1] / len(pointlist)
+
+        pygame.draw.circle(self.draw_surface, vehicle.drivertype.color, (int(avgx), int(avgy)), int(vehicle.cartype.width/2))
+        pygame.draw.polygon(self.draw_surface, vehicle.cartype.color, pointlist)
 
     def drawRoad(self, road):
         """
