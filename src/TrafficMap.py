@@ -1,5 +1,6 @@
 import random
-
+from src.drivers.DriverTemplate import *
+from src.vehicles.VehicleTemplate import *
 
 class TrafficMap:
     """
@@ -31,7 +32,10 @@ class TrafficMap:
         """
         for i in range(len(self.roadlist)):
             if self.roadlist[i].chance_spawn >= random.random():
-                self.roadlist[i].spawn()
+                if random.random() > .5:
+                    self.roadlist[i].spawn()
+                else:
+                    self.roadlist[i].spawn(VehicleTemplate(),SlowDriver())
 
             self.roadlist[i].tick(ticktime_ms)
 
