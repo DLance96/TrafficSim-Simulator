@@ -112,7 +112,7 @@ class Vehicle:
         for vehicle in self.vehicle_neigbors.nearby_vehicles:
             brake_decel += self.respond_vehicle_brake(vehicle)
 
-        brake_decel = min(brake_decel, self.drivertype.max_brake_decel)
+        brake_decel = min(brake_decel, self.cartype.max_brake_decel)
 
         if brake_decel > 0:
             self.ax = -brake_decel
@@ -124,7 +124,7 @@ class Vehicle:
 
         self.vy += self.ay * ticktime_ms / 1000
 
-        return (self.x + self.vx * ticktime_ms / 1000, self.y + self.vy * ticktime_ms / 1000)
+        return self.x + self.vx * ticktime_ms / 1000, self.y + self.vy * ticktime_ms / 1000
 
     def update_vehicle_neighbors(self, nearby_vehicles):
         """

@@ -97,19 +97,8 @@ class DisplayController:
         :param vehicle:
         :return: None
         """
-        first = (vehicle.x - vehicle.cartype.width / 2 * math.cos(vehicle.orientation + math.pi / 2),
-                 vehicle.y - vehicle.cartype.width / 2 * math.sin(vehicle.orientation + math.pi / 2))
-        
-        second = (first[0] + vehicle.cartype.length * math.cos(vehicle.orientation),
-                  first[1] + vehicle.cartype.length * math.sin(vehicle.orientation))
 
-        third = (second[0] + vehicle.cartype.width * math.cos(vehicle.orientation + math.pi / 2),
-                 second[1] + vehicle.cartype.width * math.sin(vehicle.orientation + math.pi / 2))
-
-        fourth = (first[0] + vehicle.cartype.width * math.cos(vehicle.orientation + math.pi / 2),
-                  first[1] + vehicle.cartype.width * math.sin(vehicle.orientation + math.pi / 2))
-
-        pointlist = list(map(road.local_to_global_location_conversion, [first, second, third, fourth]))
+        pointlist = list(map(road.local_to_global_location_conversion, vehicle.get_bounding))
 
         vehicle_color = Color(255, 100, 100)
 
