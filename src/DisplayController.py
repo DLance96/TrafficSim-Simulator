@@ -98,7 +98,7 @@ class DisplayController:
         :return: None
         """
 
-        pointlist = list(map(road.local_to_global_location_conversion, vehicle.get_bounding))
+        pointlist = list(map(road.local_to_global_location_conversion, vehicle.get_bounding_points()))
 
         vehicle_color = Color(255, 100, 100)
 
