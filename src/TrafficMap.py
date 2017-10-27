@@ -1,3 +1,5 @@
+import random
+
 
 class TrafficMap:
     """
@@ -28,7 +30,11 @@ class TrafficMap:
         :return: None
         """
         for i in range(len(self.roadlist)):
+            if self.roadlist[i].chance_spawn >= random.random():
+                self.roadlist[i].spawn()
+
             self.roadlist[i].tick(ticktime_ms)
+
 
         for i in range(len(self.intersectionlist)):
             self.intersectionlist[i].tick(ticktime_ms)

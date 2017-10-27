@@ -4,12 +4,14 @@ from collections import defaultdict
 from shapely import geometry
 from src.Bucket import Bucket
 from src.Vehicle import Vehicle
+from src.drivers.DriverTemplate import DriverTemplate
+from src.vehicles.VehicleTemplate import VehicleTemplate
 
 class Road:
 
     lane_width = 10
 
-    def __init__(self, anchor_corner, length, inbound_lanes, outbound_lanes, orientation, speed_limit):
+    def __init__(self, anchor_corner, length, inbound_lanes, outbound_lanes, orientation, speed_limit, chance_spawn=0):
         """
         :param anchor_corner: [double, double]
         :param length: double
@@ -17,6 +19,7 @@ class Road:
         :param outbound_lanes: int
         :param orientatino: double (IN RADIANS!)
         :param speed_limit: int
+        :param chance_spawn: chance of spawning vehicle at given tick
         """
         self.anchor = anchor_corner
         self.length = length
@@ -37,6 +40,7 @@ class Road:
                                           outbound_lanes = self.outbound_lanes)
         self.surface = self.generate_surface()
         self.next_locations = [] # Prevents conflicts with cars being moved onto roads between tick and tock.
+        self.chance_spawn = chance_spawn
 
     def tick(self, ticktime_ms):
         """
@@ -284,7 +288,7 @@ class Road:
 
 
 
-    def spawn(self, vehicle_template, driver_template, direction):
+    def spawn(self, vehicle_template=VehicleTemplate(), driver_template=DriverTemplate(), direction='outbound'):
         """
         Takes the necessary inputs to generate a vehicle and attempts to generate the corresponding vehicles on a
         random lane at the beginning of the road driving outbound. If it would spawn on the same x-value as any

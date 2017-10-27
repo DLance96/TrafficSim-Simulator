@@ -194,6 +194,8 @@ class Vehicle:
         if self.vx > other_vehicle.vx and self.x <= other_vehicle.x:
             timeuntil = self.get_time_until_collision(other_vehicle)
             if timeuntil <= self.drivertype.following_time:
+                print("Braking")
+
                 return min((self.vx - other_vehicle.vx) / timeuntil, self.drivertype.max_break_decel)
 
 

@@ -1,3 +1,4 @@
+from pygame.locals import *
 class DriverTemplate:
 
     def __init__(self):
@@ -22,3 +23,5 @@ class DriverTemplate:
 
         # time interval to update neighbors
         self.update_time_ms = 30
+
+        self.color = Color(255, 100, 100)
