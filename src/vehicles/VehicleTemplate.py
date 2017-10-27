@@ -1,4 +1,6 @@
 from pygame.locals import *
+
+
 class VehicleTemplate:
     def __init__(self):
 
