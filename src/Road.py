@@ -1,6 +1,7 @@
 import math
 import random
 import time
+import Surface
 from collections import defaultdict
 from shapely import geometry
 from src.Bucket import Bucket
@@ -8,7 +9,7 @@ from src.Vehicle import Vehicle
 from src.drivers.DriverTemplate import DriverTemplate
 from src.vehicles.VehicleTemplate import VehicleTemplate
 
-class Road:
+class Road(Surface):
 
     lane_width = 10
 
@@ -213,6 +214,7 @@ class Road:
         try:
             neighbor = self.which_neighbor(location)
             neighbor.accept_transfer(vehicle, location)
+            self.vehicles.remove(vehicle)
         except ValueError:
             raise ValueError("A vehicle couldn't be transferred because it requested an invalid destination.")
 
