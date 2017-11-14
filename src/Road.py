@@ -138,10 +138,24 @@ class Road(Surface):
                     infront = bucket.get_next_alive_bucket().vehicles
                 vehicle.update_vehicle_neighbors(bucket.vehicles, behind, infront)
 
-
-
         next_locations = [[vehicle.compute_next_location(ticktime_ms), vehicle] for vehicle in self.vehicles]
         return next_locations
+
+    def update_positions(self):
+
+        # Update the location of each vehicle by updating it directly or transferring it to a neighboring intersection
+        for intended_location, vehicle in self.next_locations:
+            if self.is_local_on_road(intended_location):
+                vehicle.update_location(intended_location[0], intended_location[1])
+                self.appropriately_bucket(vehicle, intended_location)
+            else:
+                global_location = self.local_to_global_location_conversion(intended_location)
+                self.transfer(vehicle, global_location)
+
+        # Reset the list of cars intending to move
+        self.next_locations = []
+
+        return
 
     def is_local_on_road(self, location):
         """
@@ -256,22 +270,6 @@ class Road(Surface):
 
         return
 
-    def update_positions(self):
-
-        # Update the location of each vehicle by updating it directly or transferring it to a neighboring intersection
-        for intended_location, vehicle in self.next_locations:
-            if self.is_local_on_road(intended_location):
-                vehicle.update_location(intended_location[0], intended_location[1])
-                self.appropriately_bucket(vehicle, intended_location)
-            else:
-                global_location = self.local_to_global_location_conversion(intended_location)
-                self.transfer(vehicle, global_location)
-
-        # Reset the list of cars intending to move
-        self.next_locations = []
-
-        return
-
     # Thought about doing this bucket-wise, but can't. Vehicle can be in more than 1 bucket.
     def process_collisions(self):
         """
@@ -280,29 +278,6 @@ class Road(Surface):
         """
 
         return
-
-    # Super duper not complete
-    def have_collided(self, v1, v2):
-        """
-        Returns true if the two vehicles have collided and false otherwise.
-        :param v1: Vehicle
-        :param v2: Vehicle
-        :return:
-        """
-
-        points1 = v1.get_bounding_points()
-        points2 = v2.get_bounding_points()
-
-        #Simple initial check. If two points are more than their combined max offsets apart, no collision
-        if math.sqrt(math.pow(v1.x - v2.x, 2) + math.pow(v1.y - v2.y, 2)) > v1.max_offset() + v2.max_offset():
-            return False
-        else:
-            # Use the separating axis theorem to check for a separating axis. If it exists, no collision.
-            # https://gamedevelopment.tutsplus.com/tutorials/collision-detection-using-the-separating-axis-theorem--gamedev-169
-            return True
-
-
-
 
     def spawn(self, vehicle_template=VehicleTemplate(), driver_template=DriverTemplate(), direction='outbound'):
         """
