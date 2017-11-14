@@ -180,6 +180,3 @@ class Bucket:
         """
 
         return self.vehicles
-
-
-

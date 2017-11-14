@@ -1,8 +1,9 @@
 import math
+import Surface
 from collections import defaultdict
 
 
-class Intersection:
+class Intersection(Surface):
 
     lane_width = 10
 
@@ -19,10 +20,14 @@ class Intersection:
         self.radius = radius
         self.speed_limit = speed_limit
         self.vehicles = []
+        # These lists are all same-indexed
+        # Roads are ordered by orientation
         self.adjacent_roads = []
         self.adjacent_road_orientations = []
         self.adjacent_road_widths = []
-        self.next_locations = [] # Prevents conflicts with cars being moved onto roads between tick and tock.
+        # List of tuples storing the bounds on the angle centered at the origin subtended by the road
+        self.adjacent_road_bounding_orientations = []
+        self.next_locations = [] # Prevents conflicts with cars being moved between tick and tock.
 
     def tick(self, ticktime_ms):
         """
@@ -66,7 +71,7 @@ class Intersection:
 
     def is_local_in_intersection(self, location):
         """
-        Takes a local coordinate and returns whether or not it is on the road
+        Takes a local coordinate and returns whether or not it is in the intersection
         :param location:
         :return:
         """
@@ -76,7 +81,7 @@ class Intersection:
 
     def is_global_in_intersection(self, location):
         """
-        Takes a global coordinate and returns whether or not it is on the road
+        Takes a global coordinate and returns whether or not it is in the intersection
         :param location:
         :return:
         """
@@ -125,6 +130,7 @@ class Intersection:
         try:
             neighbor = self.which_neighbor(location)
             neighbor.accept_transfer(vehicle, location)
+            self.vehicles.remove(vehicle)
         except ValueError:
             raise ValueError("A vehicle couldn't be transferred because it requested an invalid destination.")
 
@@ -138,13 +144,27 @@ class Intersection:
         :return:
         """
 
+        self.vehicles.append(vehicle)
+        local_location = self.global_to_local_location_conversion(location)
+        vehicle.transfer_to_intersection(self, local_location)
+
         return
 
-    def update_positions(self):
+    def update_positions(self, ticktime_ms):
         """
         Updates the position of each vehicle on the intersection.
         :return:
         """
+        # Update the location of each vehicle by updating it directly or transferring it to a neighboring road
+        for intended_location, vehicle in self.next_locations:
+            if self.is_local_in_intersection(intended_location):
+                vehicle.update_location(intended_location[0], intended_location[1])
+            else:
+                global_location = self.local_to_global_location_conversion(intended_location)
+                self.transfer(vehicle, global_location)
+
+        # Reset the list of cars intending to move
+        self.next_locations = []
 
         return
 
@@ -174,5 +194,38 @@ class Intersection:
         :param road:
         :return:
         """
+
+        orientation = road.orientation
+        width = road.width
+        sine = (width / 2) / self.radius
+        angle = math.asin(sine)
+        upper_angle = (orientation + angle) % (2 * math.pi)
+        lower_angle = (orientation - angle) % (2 * math.pi)
+        # Now insert all of this information at the correct location
+        if len(self.adjacent_roads) == 0:
+            self.adjacent_roads.append(road)
+            self.adjacent_road_orientations.append(orientation)
+            self.adjacent_road_widths.append(width)
+            self.adjacent_road_bounding_orientations.append((upper_angle, lower_angle))
+        elif len(self.adjacent_roads) == 1:
+            # should never be equal
+            if self.adjacent_road_orientations[0] < orientation:
+                index = 1
+            else:
+                index = 0
+            self.adjacent_roads.insert(index, road)
+            self.adjacent_road_orientations.insert(index, orientation)
+            self.adjacent_road_widths.insert(index, width)
+            self.adjacent_road_bounding_orientations.insert(index, (upper_angle, lower_angle))
+        else:
+            # It's like adding a spoke at the right place in a wheel
+            for i in range(len(self.adjacent_roads)):
+                if (self.adjacent_road_orientations[i] < orientation) and (self.adjacent_road_orientations[i + 1] > orientation):
+                    index = i + 1
+                    self.adjacent_roads.insert(index, road)
+                    self.adjacent_road_orientations.insert(index, orientation)
+                    self.adjacent_road_widths.insert(index, width)
+                    self.adjacent_road_bounding_orientations.insert(index, (upper_angle, lower_angle))
+                    break
 
         return
