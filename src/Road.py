@@ -189,7 +189,7 @@ class Road(Surface):
         relative_y = location[1] - self.anchor[1]
         # Rotate counterclockwise by the orientation
         local_x = relative_x * math.cos(-self.orientation) - relative_y * math.sin(-self.orientation)
-        local_y = relative_y * math.cos(-self.orientation) + relative_y * math.sin(-self.orientation)
+        local_y = relative_y * math.cos(-self.orientation) + relative_x * math.sin(-self.orientation)
 
         return [local_x, local_y]
 
@@ -304,6 +304,7 @@ class Road(Surface):
                                           cartype=vehicle_template, drivertype=driver_template)
                 # Accepts a transfer from nowhere, kinda silly. Maybe rename accept_transfer for clarity?
                 self.accept_transfer(spawned_vehicle, self.local_to_global_location_conversion((x, y)))
+
         elif direction == "inbound":
 
             clear = True
