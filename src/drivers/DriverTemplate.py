@@ -50,4 +50,5 @@ class SpeedoFerraro(DriverTemplate):
         self.max_speed = 2000
         self.accel_time = 1
         self.following_time = 1
+        self.speeding_offset = 100
         self.color = Color(100, 100, 255)

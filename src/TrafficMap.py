@@ -30,6 +30,7 @@ class TrafficMap:
         :type ticktime_ms: float
         :return: None
         """
+        
         for i in range(len(self.roadlist)):
             if self.roadlist[i].chance_spawn >= random.random():
                 if random.random() > .5:

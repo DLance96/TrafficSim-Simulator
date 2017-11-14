@@ -76,13 +76,14 @@ class DisplayController:
 
         for intersection in traffic_map.get_intersections():
             self.drawIntersection(intersection)
-            # for vehicle in intersection.vehicles:
-                # we do need to be able to render vehicles in intersections at some point
-                # drawVehicle can't be hardcoded to take roads
-                # self.drawVehicle(intersection, vehicle)
-
         for road in traffic_map.get_roads():
             self.drawRoad(road)
+
+        for intersection in traffic_map.get_intersections():
+            for vehicle in intersection.vehicles:
+                self.drawVehicle(intersection, vehicle)
+
+        for road in traffic_map.get_roads():
             for vehicle in road.vehicles:
                 self.drawVehicle(road, vehicle)
 
@@ -90,10 +91,8 @@ class DisplayController:
         self.display_surface.blit(temp_surface, temp_surface.get_rect().move(self.xoffset, self.yoffset))
 
         pygame.display.update()
-
     def drawVehicle(self, road, vehicle):
         """
-
         :param vehicle:
         :return: None
         """

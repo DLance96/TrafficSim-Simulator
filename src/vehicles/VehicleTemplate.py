@@ -28,6 +28,8 @@ class VehicleTemplate:
 class Ferrari(VehicleTemplate):
 
     def __init__(self):
-        VehicleTemplate.__init__()
-        self.max_accel = 6
-        self.max_speed = 400
+        VehicleTemplate.__init__(self)
+        self.max_accel = 8
+        self.max_speed = 100
+        self.max_brake_decel = 6
+        self.color = Color(10, 231, 255)
