@@ -100,7 +100,7 @@ class Vehicle:
 
         return (rot_x, rot_y)
 
-    def get_intended_position(self, time_ahead):
+    def predict_target_position(self, time_ahead):
         """
         :param time_ahead: float
         time_ahead is how many seconds in the future this predicted position
@@ -124,29 +124,37 @@ class Vehicle:
         self.x = location[0]
         self.y = location[1]
         return
-
-    def get_time_until_collision(self, vehicle):
+    def time_until_collision_road(self, vehicle):
         if vehicle.vx == self.vx:
-            return -1
-        if vehicle.vy == self.vy:
             return -1
 
         time_untilx = abs(self.x - vehicle.x) / abs(vehicle.vx - self.vx)
 
-        time_untily = abs(self.y - vehicle.y) / abs(vehicle.vy - self.vy)
+        time_untily = time_untilx
+        if vehicle.vy != self.vy:
+            time_untily = abs(self.y - vehicle.y) / abs(vehicle.vy - self.vy)
 
         if time_untilx > 0 and time_untily > 0 and abs(time_untilx - time_untily) < 2:
             return min(time_untilx, time_untily)
 
         return -1
 
-    def compute_next_location(self, ticktime_ms):
+    def time_until_collision(self, vehicle):
+        if self.road is not None:
+            return self.time_until_collision_road(vehicle)
+
+
+    def compute_next_location_road(self, ticktime_ms):
         """
-        called by the road to update the cars intended positions
-        TODO: update method to allow smooth acceleration in traffic
-        :return: (float, float)
-        """
+               called by the road to update the cars intended positions
+               TODO: update method to allow smooth acceleration in traffic
+               :return: (float, float)
+               """
         brake_decel = 0
+
+        direction = 1 if (self.y < self.road.lane_width*self.road.outbound_lanes) else -1
+
+        # compute desired braking
         for vehicle in self.vehicle_neigbors.nearby_vehicles:
             brake_decel += self.respond_vehicle_brake(vehicle)
 
@@ -159,16 +167,27 @@ class Vehicle:
         brake_decel = min(brake_decel, self.cartype.max_brake_decel)
 
         if brake_decel > 0:
-            self.ax = -brake_decel
+            if abs(brake_decel*ticktime_ms/1000) > abs(self.vx):
+                self.ax = -brake_decel*direction
+            else:
+                self.ax = -self.vy/(ticktime_ms/1000)
         else:
-            if self.road.speed_limit + self.drivertype.speeding_offset > self.vx:
-                self.ax = min((self.road.speed_limit - self.vx) / self.drivertype.accel_time, self.drivertype.max_accel)
+            if self.road.speed_limit + self.drivertype.speeding_offset > abs(self.vx):
+                self.ax = direction*min((self.road.speed_limit - abs(self.vx)) / self.drivertype.accel_time,
+                              self.drivertype.max_accel)
 
         self.vx += self.ax * ticktime_ms / 1000
 
         self.vy += self.ay * ticktime_ms / 1000
 
         return self.x + self.vx * ticktime_ms / 1000, self.y + self.vy * ticktime_ms / 1000
+
+    def compute_next_location(self, ticktime_ms):
+
+        if self.road is not None:
+            return self.compute_next_location_road(ticktime_ms)
+
+        return self.x, self.y
 
     def update_vehicle_neighbors(self, nearby_vehicles, vehicles_behind, vehicles_infront):
         """
@@ -201,10 +220,9 @@ class Vehicle:
         returns float
         deceleration along x
         """
-        timeuntil = self.get_time_until_collision(other_vehicle)
-        if timeuntil <= self.drivertype.following_time and timeuntil > 0:
-            print(timeuntil)
-            return min((self.vx - other_vehicle.vx) / timeuntil, self.drivertype.max_break_decel)
+        timeuntil = self.time_until_collision(other_vehicle)
+        if 0 < timeuntil <= self.drivertype.following_time:
+            return min((self.vx - other_vehicle.vx) / timeuntil, self.cartype.max_brake_decel)
 
         else:
             return 0
