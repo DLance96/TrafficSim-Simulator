@@ -40,13 +40,13 @@ class Intersection(Surface):
 
         return
 
-    def tock_positions(self, ticktime_ms):
+    def tock_positions(self):
         """
         Performs the vehicle position updating tock
         :return:
         """
 
-        self.update_positions(ticktime_ms)
+        self.update_positions()
 
         return
 
@@ -66,7 +66,7 @@ class Intersection(Surface):
         :param ticktime_ms:
         :return:
         """
-        next_locations = [[vehicle.get_intended_position(ticktime_ms), vehicle] for vehicle in self.vehicles]
+        next_locations = [[vehicle.compute_next_location(ticktime_ms), vehicle] for vehicle in self.vehicles]
         return next_locations
 
     def is_local_in_intersection(self, location):
@@ -150,7 +150,7 @@ class Intersection(Surface):
 
         return
 
-    def update_positions(self, ticktime_ms):
+    def update_positions(self):
         """
         Updates the position of each vehicle on the intersection.
         :return:

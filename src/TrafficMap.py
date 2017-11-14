@@ -51,7 +51,7 @@ class TrafficMap:
             self.roadlist[i].tock_positions()
 
         for i in range(len(self.intersectionlist)):
-            self.intersectionlist[i].tock_positions(ticktime_ms)
+            self.intersectionlist[i].tock_positions()
 
         for i in range(len(self.roadlist)):
             self.roadlist[i].tock_crashes()
