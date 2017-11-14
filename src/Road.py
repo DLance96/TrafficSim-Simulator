@@ -128,15 +128,6 @@ class Road(Surface):
         :return:
         """
         current_time = time.time()*1000
-        for bucket in self.bucket_list:
-            for vehicle in bucket.vehicles:
-                behind = []
-                infront = []
-                if bucket.get_previous_alive_bucket() is not None:
-                    behind = bucket.get_previous_alive_bucket().vehicles
-                if bucket.get_next_alive_bucket() is not None:
-                    infront = bucket.get_next_alive_bucket().vehicles
-                vehicle.update_vehicle_neighbors(bucket.vehicles, behind, infront)
 
         next_locations = [[vehicle.compute_next_location(ticktime_ms), vehicle] for vehicle in self.vehicles]
         return next_locations
@@ -279,7 +270,7 @@ class Road(Surface):
 
         return
 
-    def spawn(self, vehicle_template=VehicleTemplate(), driver_template=DriverTemplate(), direction='outbound'):
+    def spawn(self, vehicle_template=VehicleTemplate(), driver_template=DriverTemplate(), direction='outbound', initx=0, laneno=-1):
         """
         Takes the necessary inputs to generate a vehicle and attempts to generate the corresponding vehicles on a
         random lane at the beginning of the road driving outbound. If it would spawn on the same x-value as any
@@ -287,6 +278,8 @@ class Road(Surface):
         :param vehicle_template:
         :param driver_template:
         :param direction:
+        :param initx:
+        :param laneno:
         :return:
         """
 
@@ -302,8 +295,11 @@ class Road(Surface):
             if clear:
                 # Pick a y location corresponding to the center of a random outbound lane
                 y = (random.randint(0, self.outbound_lanes - 1) + .5) * self.lane_width
+                if 0 <= laneno <= self.outbound_lanes:
+                    y = (laneno + .5) * self.lane_width
                 # Pick an x location so that the car is just fully on the road
-                x = vehicle_length / 2
+                x = self.length - vehicle_length / 2 - initx
+
                 spawned_vehicle = Vehicle(self, x=x, y=y, vx=0, vy=0, orientation= self.orientation,
                                           cartype=vehicle_template, drivertype=driver_template)
                 # Accepts a transfer from nowhere, kinda silly. Maybe rename accept_transfer for clarity?
@@ -318,8 +314,11 @@ class Road(Surface):
             if clear:
                 # Pick a y location corresponding to the center of a random outbound lane
                 y = self.outbound_lanes * self.lane_width + (random.randint(0, self.inbound_lanes - 1) + .5) * self.lane_width
+                if 0 <= laneno <= self.inbound_lanes:
+                    y =  self.outbound_lanes * self.lane_width + (laneno + .5) * self.lane_width
                 # Pick an x location so that the car is just fully on the road
-                x = self.length - vehicle_length / 2
+                x = vehicle_length / 2 + initx
+
                 spawned_vehicle = Vehicle(self, x=x, y=y, vx=0, vy=0, orientation= self.orientation + 2 * math.pi,
                                           cartype=vehicle_template, drivertype=driver_template)
                 # Accepts a transfer from nowhere, kinda silly. Maybe rename accept_transfer for clarity?
