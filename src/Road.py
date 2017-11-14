@@ -329,7 +329,7 @@ class Road(Surface):
                 y = (random.randint(0, self.outbound_lanes - 1) + .5) * self.lane_width
                 # Pick an x location so that the car is just fully on the road
                 x = vehicle_length / 2
-                spawned_vehicle = Vehicle(self, x=x, y=y, vx=.1, vy=0, orientation= self.orientation,
+                spawned_vehicle = Vehicle(self, x=x, y=y, vx=0, vy=0, orientation= self.orientation,
                                           cartype=vehicle_template, drivertype=driver_template)
                 # Accepts a transfer from nowhere, kinda silly. Maybe rename accept_transfer for clarity?
                 self.accept_transfer(spawned_vehicle, self.local_to_global_location_conversion((x, y)))
@@ -345,7 +345,7 @@ class Road(Surface):
                 y = self.outbound_lanes * self.lane_width + (random.randint(0, self.inbound_lanes - 1) + .5) * self.lane_width
                 # Pick an x location so that the car is just fully on the road
                 x = self.length - vehicle_length / 2
-                spawned_vehicle = Vehicle(self, x=x, y=y, vx=-.1, vy=0, orientation= self.orientation + 2 * math.pi,
+                spawned_vehicle = Vehicle(self, x=x, y=y, vx=0, vy=0, orientation= self.orientation + 2 * math.pi,
                                           cartype=vehicle_template, drivertype=driver_template)
                 # Accepts a transfer from nowhere, kinda silly. Maybe rename accept_transfer for clarity?
                 self.accept_transfer(spawned_vehicle, self.local_to_global_location_conversion((x, y)))
