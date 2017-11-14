@@ -278,8 +278,8 @@ class Road(Surface):
                 if self.have_collided(v1, v2):
                     pass
                     # I am assuming that vehicles will want to know which vehicle they collided with.
-                    # v1.collided(v2)
-                    # v2.collided(v1)
+                    v1.collided(v2)
+                    v2.collided(v1)
 
 
         return

@@ -287,3 +287,12 @@ class Vehicle:
 
         else:
             return 0
+
+    def collided(self, other_vehicle):
+        """
+        Processes a vehicle having collided with another vehicle
+        :param other_vehicle:
+        :return:
+        """
+        print("A collision has occured!")
+        return
