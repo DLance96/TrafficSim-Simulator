@@ -1,7 +1,7 @@
 import math
 import random
 import time
-import Surface
+from src.Surface import Surface
 from collections import defaultdict
 from shapely import geometry
 from src.Bucket import Bucket

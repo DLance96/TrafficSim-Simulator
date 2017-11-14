@@ -1,5 +1,5 @@
 import math
-import Surface
+from src.Surface import Surface
 from collections import defaultdict
 
 
@@ -40,13 +40,13 @@ class Intersection(Surface):
 
         return
 
-    def tock_positions(self):
+    def tock_positions(self, ticktime_ms):
         """
         Performs the vehicle position updating tock
         :return:
         """
 
-        self.update_positions()
+        self.update_positions(ticktime_ms)
 
         return
 
