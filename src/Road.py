@@ -198,7 +198,7 @@ class Road(Surface):
         relative_y = location[1] - self.anchor[1]
         # Rotate counterclockwise by the orientation
         local_x = relative_x * math.cos(-self.orientation) - relative_y * math.sin(-self.orientation)
-        local_y = relative_y * math.cos(-self.orientation) + relative_y * math.sin(-self.orientation)
+        local_y = relative_y * math.cos(-self.orientation) + relative_x * math.sin(-self.orientation)
 
         return [local_x, local_y]
 
@@ -308,6 +308,7 @@ class Road(Surface):
                                           cartype=vehicle_template, drivertype=driver_template)
                 # Accepts a transfer from nowhere, kinda silly. Maybe rename accept_transfer for clarity?
                 self.accept_transfer(spawned_vehicle, self.local_to_global_location_conversion((x, y)))
+
         elif direction == "inbound":
 
             clear = True
@@ -320,7 +321,7 @@ class Road(Surface):
                 y = self.outbound_lanes * self.lane_width + (random.randint(0, self.inbound_lanes - 1) + .5) * self.lane_width
                 # Pick an x location so that the car is just fully on the road
                 x = self.length - vehicle_length / 2
-                spawned_vehicle = Vehicle(self, x=x, y=y, vx=0, vy=0, orientation= self.orientation + 2 * math.pi,
+                spawned_vehicle = Vehicle(self, x=x, y=y, vx=0, vy=0, orientation= self.orientation + math.pi,
                                           cartype=vehicle_template, drivertype=driver_template)
                 # Accepts a transfer from nowhere, kinda silly. Maybe rename accept_transfer for clarity?
                 self.accept_transfer(spawned_vehicle, self.local_to_global_location_conversion((x, y)))
