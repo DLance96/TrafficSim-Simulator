@@ -128,12 +128,12 @@ class Vehicle:
     def get_time_until_collision(self, vehicle):
         if vehicle.vx == self.vx:
             return -1
-        if vehicle.vy == self.vy:
-            return -1
 
         time_untilx = abs(self.x - vehicle.x) / abs(vehicle.vx - self.vx)
 
-        time_untily = abs(self.y - vehicle.y) / abs(vehicle.vy - self.vy)
+        time_untily = time_untilx
+        if vehicle.vy != self.vy:
+            time_untily = abs(self.y - vehicle.y) / abs(vehicle.vy - self.vy)
 
         if time_untilx > 0 and time_untily > 0 and abs(time_untilx - time_untily) < 2:
             return min(time_untilx, time_untily)
@@ -147,6 +147,8 @@ class Vehicle:
         :return: (float, float)
         """
         brake_decel = 0
+
+
         for vehicle in self.vehicle_neigbors.nearby_vehicles:
             brake_decel += self.respond_vehicle_brake(vehicle)
 
@@ -203,8 +205,7 @@ class Vehicle:
         """
         timeuntil = self.get_time_until_collision(other_vehicle)
         if timeuntil <= self.drivertype.following_time and timeuntil > 0:
-            print(timeuntil)
-            return min((self.vx - other_vehicle.vx) / timeuntil, self.drivertype.max_break_decel)
+            return min((self.vx - other_vehicle.vx) / timeuntil, self.cartype.max_brake_decel)
 
         else:
             return 0
