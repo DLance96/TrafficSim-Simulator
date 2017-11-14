@@ -1,4 +1,5 @@
 import math
+import itertools
 from src.Surface import Surface
 from collections import defaultdict
 
@@ -173,6 +174,14 @@ class Intersection(Surface):
         Discovers which vehicles have crashed and informs them.
         :return:
         """
+
+        vehicle_pairs = list(itertools.combinations(self.vehicles, 2))
+        for (v1, v2) in vehicle_pairs:
+            if self.have_collided(v1, v2):
+                pass
+                # I am assuming that vehicles will want to know which vehicle they collided with.
+                #v1.collided(v2)
+                #v2.collided(v1)
 
         return
 

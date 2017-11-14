@@ -18,11 +18,11 @@ class Surface:
         edges = []
 
         # Vectors 1 and 2 are the normals to edges of vehicle 1
-        edges.append(pts1[1] - pts1[0])
-        edges.append(pts1[2] - pts1[1])
+        edges.append(np.subtract(pts1[1], pts1[0]))
+        edges.append(np.subtract(pts1[2], pts1[1]))
         # Vectors 3 and 4 are the normals to edges of vehicle 2
-        edges.append(pts2[1] - pts2[0])
-        edges.append(pts2[2] - pts2[1])
+        edges.append(np.subtract(pts2[1], pts2[0]))
+        edges.append(np.subtract(pts2[2], pts2[1]))
 
         for edge in edges:
             if self.separating(pts1, pts2, edge):

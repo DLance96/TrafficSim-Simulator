@@ -1,6 +1,7 @@
 import math
 import random
 import time
+import itertools
 from src.Surface import Surface
 from collections import defaultdict
 from shapely import geometry
@@ -270,12 +271,25 @@ class Road(Surface):
 
         return
 
-    # Thought about doing this bucket-wise, but can't. Vehicle can be in more than 1 bucket.
     def process_collisions(self):
         """
         Locates those vehicles which have been in a collision and informs them of that fact.
         :return:
         """
+
+        for bucket in self.bucket_list:
+            preceding = [] if bucket.get_previous_bucket() == None else bucket.get_previous_bucket().get_vehicles()
+            following = [] if bucket.get_next_bucket() == None else bucket.get_next_bucket().get_vehicles()
+            current = bucket.get_vehicles()
+            vehicle_list = preceding + current + following
+            vehicle_pairs = list(itertools.combinations(vehicle_list, 2))
+            for (v1, v2) in vehicle_pairs:
+                if self.have_collided(v1, v2):
+                    pass
+                    # I am assuming that vehicles will want to know which vehicle they collided with.
+                    # v1.collided(v2)
+                    # v2.collided(v1)
+
 
         return
 
