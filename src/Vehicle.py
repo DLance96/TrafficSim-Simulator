@@ -118,11 +118,17 @@ class Vehicle:
         return -1 if (self.y <= self.road.lane_width * self.road.outbound_lanes) else 1
 
     # Takes a road and a local location and sets the car to being on that road at that location
+    # Cars enter roads parallel to the road
     def transfer_to_road(self, road, location):
         self.road = road
         self.intersection = None
         self.x = location[0]
         self.y = location[1]
+        orientation = road.orientation
+        new_velocity = self.rotate_around_origin(self.vx, self.vy, -orientation)
+        self.orientation = 0
+        self.vx = new_velocity[0]
+        self.vy = new_velocity[1]
         return
 
     # Takes an intersection and a local location and sets the car to being in that intersection at that location
