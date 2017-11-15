@@ -14,7 +14,7 @@ class Road(Surface):
 
     lane_width = 10
 
-    def __init__(self, anchor_corner, length, inbound_lanes, outbound_lanes, orientation, speed_limit, name, chance_spawn=0):
+    def __init__(self, anchor_corner, length, inbound_lanes, outbound_lanes, orientation, speed_limit, chance_spawn=0):
         """
         :param anchor_corner: [double, double]
         :param length: double
@@ -24,7 +24,8 @@ class Road(Surface):
         :param speed_limit: int
         :param chance_spawn: chance of spawning vehicle at given tick
         """
-        self.name = name
+        # Brett wants this added at some point for pathfinding
+        # self.name = name
         self.anchor = anchor_corner
         self.length = length
         self.inbound_lanes = inbound_lanes
