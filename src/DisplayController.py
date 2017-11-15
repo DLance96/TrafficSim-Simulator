@@ -3,8 +3,8 @@ import math
 from pygame.locals import *
 from src.Road import Road
 
-class DisplayController:
 
+class DisplayController:
     def __init__(self):
         """
         Initializes DisplayController
@@ -24,7 +24,7 @@ class DisplayController:
         :type keys_down: list(bool)
         :return: None
         """
-        move_interval = int(10*self.display_size[0]/self.display_zoom[0])
+        move_interval = int(10 * self.display_size[0] / self.display_zoom[0])
         scale_factor = 100
         if keys_down[pygame.K_LEFT]:
             self.xoffset += move_interval
@@ -39,18 +39,18 @@ class DisplayController:
             self.yoffset -= move_interval
 
         if keys_down[pygame.K_q]:
-            self.display_zoom = (self.display_zoom[0]*1.01),\
-                                (self.display_zoom[1]*1.01)
-            #self.xoffset -= self.display_size[0] / scale_factor / 2
-            #self.yoffset -= self.display_size[1] / scale_factor / 2
+            self.display_zoom = (self.display_zoom[0] * 1.01), \
+                                (self.display_zoom[1] * 1.01)
+            # self.xoffset -= self.display_size[0] / scale_factor / 2
+            # self.yoffset -= self.display_size[1] / scale_factor / 2
 
         if keys_down[pygame.K_w]:
             if self.display_zoom[0] > 100:
-                self.display_zoom = (self.display_zoom[0]/1.01),\
-                                    (self.display_zoom[1]/1.01)
+                self.display_zoom = (self.display_zoom[0] / 1.01), \
+                                    (self.display_zoom[1] / 1.01)
 
-                #self.xoffset += self.display_size[0] / scale_factor / 2
-                #self.yoffset += self.display_size[1] / scale_factor / 2
+                # self.xoffset += self.display_size[0] / scale_factor / 2
+                # self.yoffset += self.display_size[1] / scale_factor / 2
 
     def render(self, traffic_map):
         """
@@ -87,10 +87,11 @@ class DisplayController:
             for vehicle in road.vehicles:
                 self.drawVehicle(road, vehicle)
 
-        temp_surface = pygame.transform.scale(self.draw_surface,tuple(map(int, self.display_zoom)))
+        temp_surface = pygame.transform.scale(self.draw_surface, tuple(map(int, self.display_zoom)))
         self.display_surface.blit(temp_surface, temp_surface.get_rect().move(self.xoffset, self.yoffset))
 
         pygame.display.update()
+
     def drawVehicle(self, container, vehicle):
         """
         :param vehicle:
@@ -106,8 +107,8 @@ class DisplayController:
             avgy += point[1] / len(pointlist)
 
         pygame.draw.polygon(self.draw_surface, vehicle.cartype.color, pointlist)
-        pygame.draw.circle(self.draw_surface, vehicle.drivertype.color, (int(avgx), int(avgy)), int(vehicle.cartype.width/2))
-
+        pygame.draw.circle(self.draw_surface, vehicle.drivertype.color, (int(avgx), int(avgy)),
+                           int(vehicle.cartype.width / 2))
 
     def drawRoad(self, road):
         """
@@ -125,8 +126,8 @@ class DisplayController:
         fourth = (first[0] + road.width * math.cos(road.orientation + math.pi / 2),
                   first[1] + road.width * math.sin(road.orientation + math.pi / 2))
 
-        pointlist = [first,second,third,fourth]
-        road_color = Color(100,100,100)
+        pointlist = [first, second, third, fourth]
+        road_color = Color(100, 100, 100)
         pygame.draw.polygon(self.draw_surface, road_color, pointlist)
         point1 = (first[0] + (fourth[0] - first[0]) * road.inbound_lanes / (road.inbound_lanes + road.outbound_lanes),
                   first[1] + (fourth[1] - first[1]) * road.inbound_lanes / (road.inbound_lanes + road.outbound_lanes))
@@ -142,8 +143,5 @@ class DisplayController:
         :type intersection: Intersection
         :return:
         """
-        road_color = Color(100,100,100)
+        road_color = Color(100, 100, 100)
         pygame.draw.circle(self.draw_surface, road_color, intersection.center, intersection.radius)
-
-
-

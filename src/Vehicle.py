@@ -1,5 +1,6 @@
 import time
 import operator
+import random
 from src.vehicles.VehicleTemplate import VehicleTemplate
 from src.drivers.DriverTemplate import DriverTemplate
 import math
@@ -212,6 +213,27 @@ class Vehicle:
         # return next position based on vx, vy
         return self.x + self.vx * ticktime_ms / 1000, self.y + self.vy * ticktime_ms / 1000
 
+    def compute_next_location_intersection(self, ticktime_ms):
+        """
+        :param ticktime_ms:
+        :return:
+        """
+        roadno = random.randint(0, len(self.intersection.adjacent_road_bounding_orientations)-1)
+        # roadno = 1
+        orientation = self.intersection.adjacent_road_bounding_orientations[roadno][0] - math.pi/10
+        globalx, globaly = self.intersection.local_to_global_location_conversion((self.x, self.y))
+        destination = (self.intersection.center[0] + math.cos(orientation) * self.intersection.radius*1.1,
+                       self.intersection.center[1] + math.sin(orientation) * self.intersection.radius*1.1)
+        accel_vector = (destination[0] - globalx, destination[1] - globaly)
+        # self.ax = accel_vector[0]*2
+        # self.ay = accel_vector[1]*2
+
+        # self.vx += self.ax * ticktime_ms / 1000
+        # self.vy += self.ay * ticktime_ms / 1000
+        self.vx = accel_vector[0]/10
+        self.vy = accel_vector[1]/10
+        return self.x + self.vx * ticktime_ms / 1000, self.y + self.vy * ticktime_ms / 1000
+
     def compute_next_location(self, ticktime_ms):
 
         if self.road is not None:
@@ -224,6 +246,8 @@ class Vehicle:
             self.update_vehicle_neighbors(self.bucket.vehicles, behind, infront)
 
             return self.compute_next_location_road(ticktime_ms)
+        elif self.intersection is not None:
+            return self.compute_next_location_intersection(ticktime_ms)
 
         return self.x, self.y
 
@@ -261,7 +285,7 @@ class Vehicle:
 
         if 0 <= timeuntil:
             if self.x * direction < other_vehicle.x * direction:
-                return (self.drivertype.following_time/timeuntil)*abs(self.vx - other_vehicle.vx) / timeuntil
+                return (self.drivertype.following_time / timeuntil) * abs(self.vx - other_vehicle.vx) / timeuntil
 
         return 0
 
@@ -293,5 +317,5 @@ class Vehicle:
         :param other_vehicle:
         :return:
         """
-        #print("A collision has occured!")
+        # print("A collision has occured!")
         return
