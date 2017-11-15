@@ -242,7 +242,7 @@ class Intersection(Surface):
 
         return
 
-    def bind_road_to_intersection(self, road, intersection, side):
+    def bind_road_to_intersection(self, road, side):
         """
         Takes a road, an intersection, and which end of the road the intersection is and binds them together
         :param road:
@@ -252,6 +252,6 @@ class Intersection(Surface):
         """
         if side != "initial" and side != "terminal":
             raise ValueError("The two ends of a road are the 'initial' end and the 'terminal' end.")
-        road.add_neighboring_intersection(intersection, side)
-        intersection.add_neighboring_road(road, side)
+        road.add_neighboring_intersection(self, side)
+        self.add_neighboring_road(road, side)
         return

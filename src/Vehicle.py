@@ -234,7 +234,12 @@ class Vehicle:
         """
         # roadno is a placeholder that hsould be deleted
         if self.roadno == -1:
-            self.roadno = random.randint(0, len(self.intersection.adjacent_road_bounding_orientations)-1)
+            print (len(self.intersection.adjacent_road_bounding_orientations))
+            if len(self.intersection.adjacent_road_bounding_orientations) > 1:
+                self.roadno = random.randint(0, len(self.intersection.adjacent_road_bounding_orientations)-1)
+            else:
+                self.roadno = 0
+
         orientation = (self.intersection.adjacent_road_orientations[self.roadno] + self.intersection.adjacent_road_bounding_orientations[self.roadno][0])/2
         globalx, globaly = self.intersection.local_to_global_location_conversion((self.x, self.y))
         destination = (self.intersection.center[0] + math.cos(orientation) * self.intersection.radius*1.1,
