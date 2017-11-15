@@ -198,15 +198,16 @@ class Intersection(Surface):
         """
         return
 
-    def add_neighboring_road(self, road):
+    def add_neighboring_road(self, road, side):
         """
         Takes a road and adds it to the intersection.
         This is assumed to be unable to fail, as non-physical roads should have errored before the simulation.
         :param road:
+        :param side: informs the intersection if the road considers the intersection initial or terminal
         :return:
         """
 
-        orientation = road.orientation
+        orientation = road.orientation if side == "terminal" else (road.orientation + math.pi) % (2 * math.pi)
         width = road.width
         sine = (width / 2) / self.radius
         angle = math.asin(sine)
@@ -239,4 +240,18 @@ class Intersection(Surface):
                     self.adjacent_road_bounding_orientations.insert(index, (upper_angle, lower_angle))
                     break
 
+        return
+
+    def bind_road_to_intersection(self, road, intersection, side):
+        """
+        Takes a road, an intersection, and which end of the road the intersection is and binds them together
+        :param road:
+        :param intersection:
+        :param side: "initial" or "terminal"
+        :return:
+        """
+        if side != "initial" and side != "terminal":
+            raise ValueError("The two ends of a road are the 'initial' end and the 'terminal' end.")
+        road.add_neighboring_intersection(intersection, side)
+        intersection.add_neighboring_road(road, side)
         return
