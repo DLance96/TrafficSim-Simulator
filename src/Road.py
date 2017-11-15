@@ -24,6 +24,8 @@ class Road(Surface):
         :param speed_limit: int
         :param chance_spawn: chance of spawning vehicle at given tick
         """
+        # Brett wants this added at some point for pathfinding
+        # self.name = name
         self.anchor = anchor_corner
         self.length = length
         self.inbound_lanes = inbound_lanes
@@ -202,9 +204,9 @@ class Road(Surface):
         """
 
         if self.initial_intersection.is_global_in_intersection(location):
-            return self.initial_intersection
+            return self.initial_intersection, "initial"
         elif self.terminal_intersection.is_global_in_intersection(location):
-            return self.terminal_intersection
+            return self.terminal_intersection, "terminal"
         else:
             raise ValueError("No neighbor contains that location.")
             return
@@ -218,8 +220,10 @@ class Road(Surface):
         """
 
         try:
-            neighbor = self.which_neighbor(location)
-            neighbor.accept_transfer(vehicle, location)
+            # Side is "initial" / "terminal"
+            neighbor, side = self.which_neighbor(location)
+            vehicle.last_road = self
+            neighbor.accept_transfer(vehicle, location, self, side)
             self.vehicles.remove(vehicle)
         except ValueError:
             raise ValueError("A vehicle couldn't be transferred because it requested an invalid destination.")

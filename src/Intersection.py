@@ -137,17 +137,19 @@ class Intersection(Surface):
 
         return
 
-    def accept_transfer(self, vehicle, location):
+    def accept_transfer(self, vehicle, location, road, side):
         """
-        Takes a vehicle and a global coordinate and places the vehicle at the local version of the coordinate.
+        Takes a vehicle a global coordinate and the road the vehicle came from
+        and places the vehicle at the local version of the coordinate.
         :param vehicle:
         :param location:
+        :param road:
         :return:
         """
-
+        road_orientation = road.orientation if side == "terminal" else road.orientation + math.pi
         self.vehicles.append(vehicle)
         local_location = self.global_to_local_location_conversion(location)
-        vehicle.transfer_to_intersection(self, local_location)
+        vehicle.transfer_to_intersection(self, local_location, road_orientation)
 
         return
 
