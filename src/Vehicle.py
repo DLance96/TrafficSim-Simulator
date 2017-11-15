@@ -172,7 +172,6 @@ class Vehicle:
                """
         brake_decel = 0
         slowdown_decel = 0
-
         direction = self.correct_direction()
 
         # compute desired braking and slowdown
@@ -294,5 +293,5 @@ class Vehicle:
         :param other_vehicle:
         :return:
         """
-        print("A collision has occured!")
+        #print("A collision has occured!")
         return

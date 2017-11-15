@@ -91,13 +91,13 @@ class DisplayController:
         self.display_surface.blit(temp_surface, temp_surface.get_rect().move(self.xoffset, self.yoffset))
 
         pygame.display.update()
-    def drawVehicle(self, road, vehicle):
+    def drawVehicle(self, container, vehicle):
         """
         :param vehicle:
         :return: None
         """
 
-        pointlist = list(map(road.local_to_global_location_conversion, vehicle.get_bounding_points()))
+        pointlist = list(map(container.local_to_global_location_conversion, vehicle.get_bounding_points()))
 
         avgx = 0
         avgy = 0

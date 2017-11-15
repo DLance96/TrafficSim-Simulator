@@ -314,7 +314,7 @@ class Road(Surface):
                 # Pick an x location so that the car is just fully on the road
                 x = self.length - vehicle_length / 2 - initx
 
-                spawned_vehicle = Vehicle(self, x=x, y=y, vx=0, vy=0, orientation= self.orientation,
+                spawned_vehicle = Vehicle(self, x=x, y=y, vx=0, vy=0, orientation= 0,
                                           cartype=vehicle_template, drivertype=driver_template)
                 # Accepts a transfer from nowhere, kinda silly. Maybe rename accept_transfer for clarity?
                 self.accept_transfer(spawned_vehicle, self.local_to_global_location_conversion((x, y)))
@@ -334,7 +334,7 @@ class Road(Surface):
                 # Pick an x location so that the car is just fully on the road
                 x = vehicle_length / 2 + initx
 
-                spawned_vehicle = Vehicle(self, x=x, y=y, vx=0, vy=0, orientation= self.orientation + 2 * math.pi,
+                spawned_vehicle = Vehicle(self, x=x, y=y, vx=0, vy=0, orientation= 0,
                                           cartype=vehicle_template, drivertype=driver_template)
                 # Accepts a transfer from nowhere, kinda silly. Maybe rename accept_transfer for clarity?
                 self.accept_transfer(spawned_vehicle, self.local_to_global_location_conversion((x, y)))
