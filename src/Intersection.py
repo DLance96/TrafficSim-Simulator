@@ -10,11 +10,8 @@ class Intersection(Surface):
 
     def __init__(self, center, radius, speed_limit):
         """
-        :param anchor_corner: [double, double]
-        :param length: double
-        :param inbound_lanes: int
-        :param outbound_lanes: int
-        :param orientatino: double (IN RADIANS!)
+        :param center: [double, double]
+        :param radius: double
         :param speed_limit: int
         """
         self.center = center
