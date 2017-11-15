@@ -146,7 +146,7 @@ class Intersection(Surface):
         :param road:
         :return:
         """
-        road_orientation = road.orientation if side == "terminal" else -road.orientation
+        road_orientation = road.orientation if side == "terminal" else road.orientation + math.pi
         self.vehicles.append(vehicle)
         local_location = self.global_to_local_location_conversion(location)
         vehicle.transfer_to_intersection(self, local_location, road_orientation)
