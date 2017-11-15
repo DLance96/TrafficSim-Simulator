@@ -1,5 +1,6 @@
 import pygame
 import math
+import random
 from pygame.locals import *
 from src.Road import Road
 
@@ -86,6 +87,7 @@ class DisplayController:
         for road in traffic_map.get_roads():
             for vehicle in road.vehicles:
                 self.drawVehicle(road, vehicle)
+        
 
         temp_surface = pygame.transform.scale(self.draw_surface, tuple(map(int, self.display_zoom)))
         self.display_surface.blit(temp_surface, temp_surface.get_rect().move(self.xoffset, self.yoffset))

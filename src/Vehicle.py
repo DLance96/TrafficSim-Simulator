@@ -222,7 +222,8 @@ class Vehicle:
         self.vx += self.ax * ticktime_ms / 1000
         # increment vy by ay
         self.vy += self.ay * ticktime_ms / 1000
-
+        #placeholder
+        self.vy = 0
         # return next position based on vx, vy
         return self.x + self.vx * ticktime_ms / 1000, self.y + self.vy * ticktime_ms / 1000
 
@@ -231,9 +232,10 @@ class Vehicle:
         :param ticktime_ms:
         :return:
         """
-        roadno = random.randint(0, len(self.intersection.adjacent_road_bounding_orientations)-1)
-        # roadno = 1
-        orientation = self.intersection.adjacent_road_bounding_orientations[roadno][0] - math.pi/10
+        # roadno is a placeholder that hsould be deleted
+        if self.roadno == -1:
+            self.roadno = random.randint(0, len(self.intersection.adjacent_road_bounding_orientations)-1)
+        orientation = (self.intersection.adjacent_road_orientations[self.roadno] + self.intersection.adjacent_road_bounding_orientations[self.roadno][0])/2
         globalx, globaly = self.intersection.local_to_global_location_conversion((self.x, self.y))
         destination = (self.intersection.center[0] + math.cos(orientation) * self.intersection.radius*1.1,
                        self.intersection.center[1] + math.sin(orientation) * self.intersection.radius*1.1)
@@ -243,13 +245,15 @@ class Vehicle:
 
         # self.vx += self.ax * ticktime_ms / 1000
         # self.vy += self.ay * ticktime_ms / 1000
-        self.vx = accel_vector[0]/10
-        self.vy = accel_vector[1]/10
+        self.orientation = math.tan(accel_vector[1] / accel_vector[0])
+        self.vx = accel_vector[0]/abs(accel_vector[0])*2
+        self.vy = accel_vector[1]/abs(accel_vector[1])*2
         return self.x + self.vx * ticktime_ms / 1000, self.y + self.vy * ticktime_ms / 1000
 
     def compute_next_location(self, ticktime_ms):
 
         if self.road is not None:
+            self.roadno = -1
             behind = []
             infront = []
             if self.bucket.get_previous_alive_bucket() is not None:
