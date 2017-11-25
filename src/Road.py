@@ -225,7 +225,8 @@ class Road(Surface):
             neighbor.accept_transfer(vehicle, location, self, side)
             self.vehicles.remove(vehicle)
         except ValueError:
-            raise ValueError("A vehicle couldn't be transferred because it requested an invalid destination.")
+            print("A vehicle couldn't be transferred because it requested an invalid destination.")
+            self.vehicles.remove(vehicle)
 
         return
 
