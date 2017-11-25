@@ -28,6 +28,7 @@ class Vehicle:
         :param cartype:
         """
 
+        # These are here to resolve a circular dependency
         from src.Road import Road
         from src.Intersection import Intersection
 

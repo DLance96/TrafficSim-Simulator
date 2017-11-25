@@ -33,31 +33,18 @@ lower_intersection = Intersection(center = (400, 50 + 2 * 353), radius = 30, spe
 left_intersection = Intersection(center = (400 - 353, 50 + 353), radius = 30, speed_limit = 200,
                                  template_factory = TemplatePairFactory(1000, prebuilt_list))
 
-# For each of the roads add the appropriate neighboring intersections
-lower_left_road.add_neighboring_intersection(left_intersection, 'initial')
-lower_left_road.add_neighboring_intersection(lower_intersection, 'terminal')
-
-lower_right_road.add_neighboring_intersection(lower_intersection, 'initial')
-lower_right_road.add_neighboring_intersection(right_intersection, 'terminal')
-
-upper_right_road.add_neighboring_intersection(right_intersection, 'initial')
-upper_right_road.add_neighboring_intersection(upper_intersection, 'terminal')
-
-upper_left_road.add_neighboring_intersection(upper_intersection, 'initial')
-upper_left_road.add_neighboring_intersection(left_intersection, 'terminal')
-
 # For each of the intersections add the appropriate neighboring roads
-left_intersection.add_neighboring_road(lower_left_road, 'initial')
-left_intersection.add_neighboring_road(upper_left_road, 'terminal')
+left_intersection.bind_road_to_intersection(lower_left_road, 'initial')
+left_intersection.bind_road_to_intersection(upper_left_road, 'terminal')
 
-lower_intersection.add_neighboring_road(lower_left_road, 'terminal')
-lower_intersection.add_neighboring_road(lower_right_road, 'initial')
+lower_intersection.bind_road_to_intersection(lower_left_road, 'terminal')
+lower_intersection.bind_road_to_intersection(lower_right_road, 'initial')
 
-right_intersection.add_neighboring_road(upper_right_road, 'initial')
-right_intersection.add_neighboring_road(lower_right_road, 'terminal')
+right_intersection.bind_road_to_intersection(upper_right_road, 'initial')
+right_intersection.bind_road_to_intersection(lower_right_road, 'terminal')
 
-upper_intersection.add_neighboring_road(upper_right_road, 'terminal')
-upper_intersection.add_neighboring_road(upper_left_road, 'initial')
+upper_intersection.bind_road_to_intersection(upper_right_road, 'terminal')
+upper_intersection.bind_road_to_intersection(upper_left_road, 'initial')
 
 # Add the roads to the trafficmap
 trafficmap.add_road(lower_left_road)
