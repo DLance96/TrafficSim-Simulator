@@ -4,6 +4,7 @@ from src.Surface import Surface
 from src.Vehicle import Vehicle
 from src.drivers.DriverTemplate import DriverTemplate
 from src.vehicles.VehicleTemplate import VehicleTemplate
+from itertools import repeat
 from collections import defaultdict
 
 
@@ -219,8 +220,8 @@ class Intersection(Surface):
                                 cartype = vehicle_template,
                                 drivertype = driver_template)
 
-        # This check could be sped up
-        spawning_collision = any([self.have_collided(spawned_vehicle, v) for v in self.vehicles])
+        # Check to see if the spawned vehicle collides with any vehicles currently in the intersection
+        spawning_collision = any(map(self.have_collided, self.vehicles, repeat(spawned_vehicle)))
 
         if not spawning_collision:
             self.vehicles.append((spawned_vehicle))
