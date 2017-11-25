@@ -1,6 +1,9 @@
 import math
 import itertools
 from src.Surface import Surface
+from src.Vehicle import Vehicle
+from src.drivers.DriverTemplate import DriverTemplate
+from src.vehicles.VehicleTemplate import VehicleTemplate
 from collections import defaultdict
 
 
@@ -8,7 +11,7 @@ class Intersection(Surface):
 
     lane_width = 10
 
-    def __init__(self, center, radius, speed_limit):
+    def __init__(self, center, radius, speed_limit, template_factory = None):
         """
         :param anchor_corner: [double, double]
         :param length: double
@@ -21,6 +24,7 @@ class Intersection(Surface):
         self.radius = radius
         self.speed_limit = speed_limit
         self.vehicles = []
+        self.spawning_profile = template_factory
         # These lists are all same-indexed
         # Roads are ordered by orientation
         self.adjacent_roads = []
@@ -29,15 +33,26 @@ class Intersection(Surface):
         # List of tuples storing the bounds on the angle centered at the origin subtended by the road
         self.adjacent_road_bounding_orientations = []
         self.next_locations = [] # Prevents conflicts with cars being moved between tick and tock.
+        self.name = None
 
     def tick(self, ticktime_ms):
         """
         Performs the vehicle next location getting tick
+        Spawns vehicles if appropriate
         :param ticktime_ms:
         :return:
         """
 
         self.next_locations = self.request_next_locations(ticktime_ms)
+        if self.spawning_profile is not None:
+            result = self.spawning_profile.prompt_spawn(ticktime_ms)
+            if result is not None:
+                # Code to implement converting the resulting vehicle and driver template into a vehicle
+                # and placing it onto the intersection
+                # Vehicles really need pathfinding so that they leave the intersection.
+                # For now, vehicles are created in the middle of the intersection.
+                self.spawn(result[0], result[1])
+                pass
 
         return
 
@@ -187,15 +202,29 @@ class Intersection(Surface):
 
         return
 
-    def spawn(self, vehicle_template, driver_template, direction):
+    def spawn(self, vehicle_template=VehicleTemplate(), driver_template=DriverTemplate()):
         """
-        Takes the necessary inputs to generate a vehicle and generates the corresponding vehicles at a
-        random location in the intersection
+        Takes the necessary inputs to generate a vehicle and attempts to generate the corresponding vehicles in the
+        middle of the intersection in accordance with the spawning profile's frequency.
+        If this would cause a collision, the vehicle is instead not spawned.
         :param vehicle_template:
         :param driver_template:
         :param direction:
+        :param initx:
+        :param laneno:
         :return:
         """
+
+        spawned_vehicle = Vehicle(surface = self, x=0, y=0, vx=0, vy=0, orientation=0,
+                                cartype = vehicle_template,
+                                drivertype = driver_template)
+
+        # This check could be sped up
+        spawning_collision = any([self.have_collided(spawned_vehicle, v) for v in self.vehicles])
+
+        if not spawning_collision:
+            self.vehicles.append((spawned_vehicle))
+
         return
 
     def add_neighboring_road(self, road, side):
@@ -255,3 +284,9 @@ class Intersection(Surface):
         road.add_neighboring_intersection(self, side)
         self.add_neighboring_road(road, side)
         return
+
+    def set_name(self, name):
+        self.name = name
+
+    def get_name(self):
+        return self.name
