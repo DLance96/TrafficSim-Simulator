@@ -1,10 +1,9 @@
 import time
 import operator
 import random
+import math
 from src.vehicles.VehicleTemplate import VehicleTemplate
 from src.drivers.DriverTemplate import DriverTemplate
-import math
-
 
 class Vehicle:
     class VehicleNeighbors:
@@ -15,7 +14,7 @@ class Vehicle:
             self.vehicles_behind = []
             self.vehicles_infront = []
 
-    def __init__(self, road, x=0, y=0, vx=0, vy=0, orientation=0, cartype=VehicleTemplate(),
+    def __init__(self, surface, x=0, y=0, vx=0, vy=0, orientation=0, cartype=VehicleTemplate(),
                  drivertype=DriverTemplate()):
         """
         :param road: Road
@@ -28,6 +27,10 @@ class Vehicle:
         :param orientation: double
         :param cartype:
         """
+
+        from src.Road import Road
+        from src.Intersection import Intersection
+
         self.x = x
         self.y = y
         self.vx = vx
@@ -35,13 +38,22 @@ class Vehicle:
         self.ax = 0
         self.ay = 0
         self.orientation = orientation
-        self.road = road
+        if type(surface) is Road:
+            self.intersection = None
+            self.road = surface
+        elif type(surface) is Intersection:
+            self.intersection = surface
+            self.road = None
+        else:
+            raise ValueError("Vehicle constructor requires a Road or an Intersection.")
         self.last_road = None
-        self.intersection = None
         self.vehicle_neigbors = self.VehicleNeighbors()
         self.cartype = cartype
         self.drivertype = drivertype
         self.bucket = None
+
+        # I don't know why this is here Brett, your comments say that it's legacy, but it seems to need to be set
+        self.roadno = -1
 
     def set_bucket(self, bucket):
         """

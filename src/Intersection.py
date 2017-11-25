@@ -1,6 +1,9 @@
 import math
 import itertools
 from src.Surface import Surface
+from src.Vehicle import Vehicle
+from src.drivers.DriverTemplate import DriverTemplate
+from src.vehicles.VehicleTemplate import VehicleTemplate
 from collections import defaultdict
 
 
@@ -30,10 +33,12 @@ class Intersection(Surface):
         # List of tuples storing the bounds on the angle centered at the origin subtended by the road
         self.adjacent_road_bounding_orientations = []
         self.next_locations = [] # Prevents conflicts with cars being moved between tick and tock.
+        self.name = None
 
     def tick(self, ticktime_ms):
         """
         Performs the vehicle next location getting tick
+        Spawns vehicles if appropriate
         :param ticktime_ms:
         :return:
         """
@@ -41,11 +46,12 @@ class Intersection(Surface):
         self.next_locations = self.request_next_locations(ticktime_ms)
         if self.spawning_profile is not None:
             result = self.spawning_profile.prompt_spawn(ticktime_ms)
-            if len(result) == 2:
+            if result is not None:
                 # Code to implement converting the resulting vehicle and driver template into a vehicle
-                # and placing it onto the road goes here.
-                # This should wait until vehicles have a path to follow so the vehicles can be placed
-                # on to the first road of their journey.
+                # and placing it onto the intersection
+                # Vehicles really need pathfinding so that they leave the intersection.
+                # For now, vehicles are created in the middle of the intersection.
+                self.spawn(result[0], result[1])
                 pass
 
         return
@@ -196,16 +202,80 @@ class Intersection(Surface):
 
         return
 
-    def spawn(self, vehicle_template, driver_template, direction):
+    def spawn(self, vehicle_template=VehicleTemplate(), driver_template=DriverTemplate()):
         """
-        Takes the necessary inputs to generate a vehicle and generates the corresponding vehicles at a
-        random location in the intersection
+        Takes the necessary inputs to generate a vehicle and attempts to generate the corresponding vehicles on a
+        random lane at the beginning of the given driving in the given direction.
+        If it would spawn on the same x-value as any existing vehicle, instead it is not spawned.
         :param vehicle_template:
         :param driver_template:
         :param direction:
+        :param initx:
+        :param laneno:
         :return:
         """
+
+        spawned_vehicle = Vehicle(surface = self, x=0, y=0, vx=0, vy=0, orientation=0,
+                                cartype = vehicle_template,
+                                drivertype = driver_template)
+
+        # This check could be sped up
+        spawning_collision = any([self.have_collided(spawned_vehicle, v) for v in self.vehicles])
+
+        if not spawning_collision:
+            self.vehicles.append((spawned_vehicle))
+
         return
+
+
+
+        """
+        vehicle_length = vehicle_template.length
+
+        if direction == "outbound":
+
+            clear = True
+
+            # TODO
+            # Some sort of check is necessary to make sure a car is not spawned on another car.
+
+            if clear:
+                # Pick a y location corresponding to the center of a random outbound lane
+                y = (random.randint(0, self.outbound_lanes - 1) + .5) * self.lane_width
+                if 0 <= laneno <= self.outbound_lanes:
+                    y = (laneno + .5) * self.lane_width
+                # Pick an x location so that the car is just fully on the road
+                x = self.length - vehicle_length / 2 - initx
+
+                spawned_vehicle = Vehicle(self, x=x, y=y, vx=0, vy=0, orientation= 0,
+                                          cartype=vehicle_template, drivertype=driver_template)
+                # Accepts a transfer from nowhere, kinda silly. Maybe rename accept_transfer for clarity?
+                self.accept_transfer(spawned_vehicle, self.local_to_global_location_conversion((x, y)))
+
+        elif direction == "inbound":
+
+            clear = True
+
+            # TODO
+            # Some sort of check is necessary to make sure a car is not spawned on another car.
+
+            if clear:
+                # Pick a y location corresponding to the center of a random outbound lane
+                y = self.outbound_lanes * self.lane_width + (random.randint(0, self.inbound_lanes - 1) + .5) * self.lane_width
+                if 0 <= laneno <= self.inbound_lanes:
+                    y =  self.outbound_lanes * self.lane_width + (laneno + .5) * self.lane_width
+                # Pick an x location so that the car is just fully on the road
+                x = vehicle_length / 2 + initx
+
+                spawned_vehicle = Vehicle(self, x=x, y=y, vx=0, vy=0, orientation= 0,
+                                          cartype=vehicle_template, drivertype=driver_template)
+                # Accepts a transfer from nowhere, kinda silly. Maybe rename accept_transfer for clarity?
+                self.accept_transfer(spawned_vehicle, self.local_to_global_location_conversion((x, y)))
+
+        else:
+            raise ValueError("Vehicles must be travelling inbound or outbound.")
+
+        """
 
     def add_neighboring_road(self, road, side):
         """
@@ -264,3 +334,9 @@ class Intersection(Surface):
         road.add_neighboring_intersection(self, side)
         self.add_neighboring_road(road, side)
         return
+
+    def set_name(self, name):
+        self.name = name
+
+    def get_name(self):
+        return self.name

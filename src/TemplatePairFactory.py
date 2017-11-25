@@ -10,14 +10,15 @@ class TemplatePairFactory:
         A TemplatePairFactory behaves in one of two ways.
         If the parameter mix_and_match is False, a VehicleTemplate-DriverTemplate pair are returned according to
         the prebuilt probabilities. If mix_and_match is true, the VehicleTemplate-DriverTemplate pair are selected
-        independantly from teh driver_template and vehicle_template probability lists.
+        independantly from the driver_template and vehicle_template probability lists.
+
         :param spawning_frequency: An integer representing the number of milliseconds to wait between spawning vehicles
-        :param prebuilt_vehicle_probs: Format - ((a, b), DriverTemplate, VehicleTemplate)
+        :param prebuilt_vehicle_probs: Format - [((a, b), DriverTemplate, VehicleTemplate),...]
             (a, b) represents a probability range open on the left and closed on the right.
         :param mix_and_match: Boolean to choose if the factory spawns from the prebuilt template, or by
             randomly combining vehicles and drivers from the probability lists.
-        :param driver_template_probs: Format - ((a, b), DriverTemplate)
-        :param vehicle_template_probs: Format - ((a, b), VehicleTemplate)
+        :param driver_template_probs: Format - [((a, b), DriverTemplate),...]
+        :param vehicle_template_probs: Format - [((a, b), VehicleTemplate),...]
         """
 
         # time since the last template pair was created in milliseconds
@@ -61,10 +62,10 @@ class TemplatePairFactory:
                     if rand >= range[0] and rand < range[1]:
                         vehicle = template
                         break
-                return driver, vehicle
+                return vehicle, driver
             else:
                 for range, driver, vehicle in self.prebuilts:
                     if rand >= range[0] and rand < range[1]:
-                        return driver, vehicle
+                        return vehicle, driver
         else:
             return None
