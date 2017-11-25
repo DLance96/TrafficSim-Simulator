@@ -88,6 +88,16 @@ class DisplayController:
             for vehicle in road.vehicles:
                 self.drawVehicle(road, vehicle)
 
+        for intersection in traffic_map.get_intersections():
+            for angle in intersection.adjacent_road_orientations:
+                pygame.draw.circle(self.draw_surface, Color(255, 120, 70),
+                                   (int(intersection.center[0] + math.cos(angle) * intersection.radius),
+                                    int(intersection.center[1] + math.sin(angle) * intersection.radius)), 4)
+        for intersection in traffic_map.get_intersections():
+            for value, angle in enumerate(intersection.adjacent_road_bounding_orientations):
+                pygame.draw.circle(self.draw_surface, Color(value*100, 250-value*120, 250-value*70),
+                                   (int(intersection.center[0] + math.cos(angle[0]) * intersection.radius),
+                                    int(intersection.center[1] + math.sin(angle[0]) * intersection.radius)), 4)
 
         temp_surface = pygame.transform.scale(self.draw_surface, tuple(map(int, self.display_zoom)))
         self.display_surface.blit(temp_surface, temp_surface.get_rect().move(self.xoffset, self.yoffset))

@@ -1,8 +1,9 @@
+coverage==4.4.2
 numpy==1.13.1
 py==1.4.34
+pygame==1.9.3
 PyQt5==5.9
 pytest==3.2.2
-sip==4.19.3
-shapely==1.6.1
-Pygame==1.9.3
 pytest-cov==2.5.1
+Shapely==1.6.1
+sip==4.19.3

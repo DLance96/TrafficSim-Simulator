@@ -72,8 +72,8 @@ lower_left_road.spawn(VehicleTemplate(), DriverTemplate(), "inbound")
 lower_right_road.spawn(VehicleTemplate(), DriverTemplate(), "outbound")
 lower_right_road.spawn(VehicleTemplate(), DriverTemplate(), "inbound")
 
-#upper_right_road.spawn(VehicleTemplate(), DriverTemplate(), "outbound")
-#upper_right_road.spawn(VehicleTemplate(), DriverTemplate(), "inbound")
+upper_right_road.spawn(VehicleTemplate(), DriverTemplate(), "outbound")
+upper_right_road.spawn(VehicleTemplate(), DriverTemplate(), "inbound")
 upper_left_road.spawn(VehicleTemplate(), DriverTemplate(), "outbound")
 upper_left_road.spawn(VehicleTemplate(), DriverTemplate(), "inbound")
 
