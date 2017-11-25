@@ -8,7 +8,7 @@ class Intersection(Surface):
 
     lane_width = 10
 
-    def __init__(self, center, radius, speed_limit):
+    def __init__(self, center, radius, speed_limit, template_factory = None):
         """
         :param anchor_corner: [double, double]
         :param length: double
@@ -21,6 +21,7 @@ class Intersection(Surface):
         self.radius = radius
         self.speed_limit = speed_limit
         self.vehicles = []
+        self.spawning_profile = template_factory
         # These lists are all same-indexed
         # Roads are ordered by orientation
         self.adjacent_roads = []
@@ -38,6 +39,14 @@ class Intersection(Surface):
         """
 
         self.next_locations = self.request_next_locations(ticktime_ms)
+        if self.spawning_profile is not None:
+            result = self.spawning_profile.prompt_spawn(ticktime_ms)
+            if len(result) == 2:
+                # Code to implement converting the resulting vehicle and driver template into a vehicle
+                # and placing it onto the road goes here.
+                # This should wait until vehicles have a path to follow so the vehicles can be placed
+                # on to the first road of their journey.
+                pass
 
         return
 
