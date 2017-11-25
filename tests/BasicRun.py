@@ -13,15 +13,15 @@ from src.drivers.DriverTemplate import SlowDriver
 from src.vehicles.VehicleTemplate import Ferrari
 
 trafficmap = TrafficMap()
-onlyroad = Road([200,200], 1000, 2, 2, 0, 50, .01)
+onlyroad = Road([200,200], 800, 2, 2, 0, 50, .01)
 initial_intersection = Intersection(center = (200, 220), radius = 30, speed_limit = 200)
-terminal_intersection = Intersection(center = (1200, 220), radius = 30, speed_limit = 200)
+terminal_intersection = Intersection(center = (1000, 220), radius = 30, speed_limit = 200)
 initial_intersection.bind_road_to_intersection(onlyroad,'terminal')
 terminal_intersection.bind_road_to_intersection(onlyroad,'initial')
 trafficmap.roadlist.append(onlyroad)
 trafficmap.intersectionlist.append(initial_intersection)
 trafficmap.intersectionlist.append(terminal_intersection)
-controller = SimulationController(trafficmap, 20, 100, 60)
+controller = SimulationController(trafficmap, 100, 100, 60)
 onlyroad.spawn(Ferrari(), SpeedoFerraro(), "outbound", initx=0, laneno=0)
 onlyroad.spawn(VehicleTemplate(), SlowDriver(), "outbound", initx=500, laneno=0)
 onlyroad.spawn(Ferrari(), SpeedoFerraro(), "inbound", initx=0, laneno=0)

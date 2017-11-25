@@ -63,7 +63,7 @@ trafficmap.intersectionlist.append(lower_intersection)
 trafficmap.intersectionlist.append(upper_intersection)
 trafficmap.intersectionlist.append(right_intersection)
 
-controller = SimulationController(trafficmap, 40, 200, 60)
+controller = SimulationController(trafficmap, 200, 200, 60)
 
 # Spawn some cars
 lower_left_road.spawn(VehicleTemplate(), DriverTemplate(), "outbound")
