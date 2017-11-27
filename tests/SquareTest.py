@@ -9,74 +9,54 @@ from src.Road import Road
 from src.Intersection import Intersection
 from src.drivers.DriverTemplate import  DriverTemplate
 from src.vehicles.VehicleTemplate import VehicleTemplate
+from src.TemplatePairFactory import TemplatePairFactory
 
 # Create the trafficmap
 trafficmap = TrafficMap()
 
+prebuilt_list = [((0, 1), DriverTemplate(),VehicleTemplate())]
+
 # Create the four roads
-lower_road = Road([120, 620], 500, 2, 2, 0, 50, .01)
-right_road = Road([620, 620], 500, 2, 2, 3 * math.pi / 2, 50, .01)
-upper_road = Road([620, 120], 500, 2, 2, math.pi, 50, .01)
-left_road = Road([120, 120], 500, 2, 2, math.pi / 2, 50, .01)
+lower_road = Road([120, 620], 500, 2, 2, 0, 50)
+right_road = Road([620, 620], 500, 2, 2, 3 * math.pi / 2, 50)
+upper_road = Road([620, 120], 500, 2, 2, math.pi, 50)
+left_road = Road([120, 120], 500, 2, 2, math.pi / 2, 50)
 
 # Create the 4 intersections
-lower_left_intersection = Intersection(center = (100, 640), radius = 30, speed_limit = 200)
-lower_right_intersection = Intersection(center = (640, 640), radius = 30, speed_limit = 200)
-upper_left_intersection = Intersection(center = (100, 100), radius = 30, speed_limit = 200)
-upper_right_intersection = Intersection(center = (640, 100), radius = 30, speed_limit = 200)
-
-# For each of the roads add the appropriate neighboring intersections
-lower_road.add_neighboring_intersection(lower_left_intersection, 'initial')
-lower_road.add_neighboring_intersection(lower_right_intersection, 'terminal')
-
-right_road.add_neighboring_intersection(lower_right_intersection, 'initial')
-right_road.add_neighboring_intersection(upper_right_intersection, 'terminal')
-
-upper_road.add_neighboring_intersection(upper_right_intersection, 'initial')
-upper_road.add_neighboring_intersection(upper_left_intersection, 'terminal')
-
-left_road.add_neighboring_intersection(upper_left_intersection, 'initial')
-left_road.add_neighboring_intersection(lower_left_intersection, 'terminal')
+lower_left_intersection = Intersection(center = (100, 640), radius = 30, speed_limit = 200,
+                                       template_factory=TemplatePairFactory(1000, prebuilt_list))
+lower_right_intersection = Intersection(center = (640, 640), radius = 30, speed_limit = 200,
+                                        template_factory=TemplatePairFactory(1000, prebuilt_list))
+upper_left_intersection = Intersection(center = (100, 100), radius = 30, speed_limit = 200,
+                                       template_factory = TemplatePairFactory(1000, prebuilt_list))
+upper_right_intersection = Intersection(center = (640, 100), radius = 30, speed_limit = 200,
+                                        template_factory = TemplatePairFactory(1000, prebuilt_list))
 
 # For each of the intersections add the appropriate neighboring roads
-lower_left_intersection.add_neighboring_road(lower_road, 'terminal')
-lower_left_intersection.add_neighboring_road(left_road, 'initial')
+lower_left_intersection.bind_road_to_intersection(lower_road, 'terminal')
+lower_left_intersection.bind_road_to_intersection(left_road, 'initial')
 
-lower_right_intersection.add_neighboring_road(lower_road, 'initial')
-lower_right_intersection.add_neighboring_road(right_road, 'terminal')
+lower_right_intersection.bind_road_to_intersection(lower_road, 'initial')
+lower_right_intersection.bind_road_to_intersection(right_road, 'terminal')
 
-upper_right_intersection.add_neighboring_road(upper_road, 'terminal')
-upper_right_intersection.add_neighboring_road(right_road, 'initial')
+upper_right_intersection.bind_road_to_intersection(upper_road, 'terminal')
+upper_right_intersection.bind_road_to_intersection(right_road, 'initial')
 
-upper_left_intersection.add_neighboring_road(upper_road, 'initial')
-upper_left_intersection.add_neighboring_road(left_road, 'terminal')
+upper_left_intersection.bind_road_to_intersection(upper_road, 'initial')
+upper_left_intersection.bind_road_to_intersection(left_road, 'terminal')
 
 # Add the roads to the trafficmap
-trafficmap.roadlist.append(lower_road)
-trafficmap.roadlist.append(right_road)
-trafficmap.roadlist.append(upper_road)
-trafficmap.roadlist.append(left_road)
+trafficmap.add_road(lower_road)
+trafficmap.add_road(right_road)
+trafficmap.add_road(upper_road)
+trafficmap.add_road(left_road)
 
 # Add the intersections to the trafficmap
-trafficmap.intersectionlist.append(lower_left_intersection)
-trafficmap.intersectionlist.append(lower_right_intersection)
-trafficmap.intersectionlist.append(upper_left_intersection)
-trafficmap.intersectionlist.append(upper_right_intersection)
+trafficmap.add_intersection(lower_left_intersection)
+trafficmap.add_intersection(lower_right_intersection)
+trafficmap.add_intersection(upper_left_intersection)
+trafficmap.add_intersection(upper_right_intersection)
 
 controller = SimulationController(trafficmap, 20, 100, 60)
-
-# Spawn some cars
-lower_road.spawn(VehicleTemplate(), DriverTemplate(), "outbound")
-lower_road.spawn(VehicleTemplate(), DriverTemplate(), "inbound")
-
-right_road.spawn(VehicleTemplate(), DriverTemplate(), "outbound")
-right_road.spawn(VehicleTemplate(), DriverTemplate(), "inbound")
-
-upper_road.spawn(VehicleTemplate(), DriverTemplate(), "outbound")
-upper_road.spawn(VehicleTemplate(), DriverTemplate(), "inbound")
-
-left_road.spawn(VehicleTemplate(), DriverTemplate(), "outbound")
-left_road.spawn(VehicleTemplate(), DriverTemplate(), "inbound")
-
 
 controller.run()

@@ -102,6 +102,7 @@ class DisplayController:
                                        (int(intersection.center[0] + math.cos(angle) * intersection.radius),
                                         int(intersection.center[1] + math.sin(angle) * intersection.radius)), 4)
 
+
         temp_surface = pygame.transform.scale(self.draw_surface, tuple(map(int, self.display_zoom)))
         self.display_surface.blit(temp_surface, temp_surface.get_rect().move(self.xoffset, self.yoffset))
 
