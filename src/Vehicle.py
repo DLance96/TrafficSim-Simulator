@@ -193,26 +193,29 @@ class Vehicle:
 
     def compute_next_location_road(self, ticktime_ms):
         """
-               called by the road to update the cars intended positions
-               TODO: update method to allow smooth acceleration in traffic
-               :return: (float, float)
-               """
+        computes next location of vehicle if the vehicle is on a road
+        :param ticktime_ms:
+        :return:
+        """
         brake_decel = 0
         slowdown_decel = 0
         direction = self.correct_direction()
 
         # compute desired braking and slowdown
         for vehicle in self.vehicle_neigbors.nearby_vehicles:
-            brake_decel += self.respond_vehicle_brake(vehicle)
-            slowdown_decel += self.respond_vehicle_slowdown(vehicle)
+            new_slowdown, new_brake = self.respond_vehicle(vehicle)
+            slowdown_decel += new_slowdown
+            brake_decel += new_brake
 
         for vehicle in self.vehicle_neigbors.vehicles_infront:
-            brake_decel += self.respond_vehicle_brake(vehicle)
-            slowdown_decel += self.respond_vehicle_slowdown(vehicle)
+            new_slowdown, new_brake = self.respond_vehicle(vehicle)
+            slowdown_decel += new_slowdown
+            brake_decel += new_brake
 
         for vehicle in self.vehicle_neigbors.vehicles_behind:
-            brake_decel += self.respond_vehicle_brake(vehicle)
-            slowdown_decel += self.respond_vehicle_slowdown(vehicle)
+            new_slowdown, new_brake = self.respond_vehicle(vehicle)
+            slowdown_decel += new_slowdown
+            brake_decel += new_brake
 
         brake_decel = min(brake_decel, self.cartype.max_brake_decel)
 
@@ -235,37 +238,44 @@ class Vehicle:
         self.vx += self.ax * ticktime_ms / 1000
         # increment vy by ay
         self.vy += self.ay * ticktime_ms / 1000
-        #placeholder
+        # placeholder
         self.vy = 0
         # return next position based on vx, vy
         return self.x + self.vx * ticktime_ms / 1000, self.y + self.vy * ticktime_ms / 1000
 
     def compute_next_location_intersection(self, ticktime_ms):
         """
-        :param ticktime_ms:
-        :return:
-        """
+       called by the road to update the cars intended positions
+       TODO: update method to allow smooth acceleration in traffic
+       :param: ticktime_ms
+       :return: (float, float)
+       """
         # roadno is a placeholder that hsould be deleted
         if self.roadno == -1:
-            print (len(self.intersection.adjacent_road_bounding_orientations))
+            print(len(self.intersection.adjacent_road_bounding_orientations))
             if len(self.intersection.adjacent_road_bounding_orientations) > 1:
-                self.roadno = random.randint(0, len(self.intersection.adjacent_road_bounding_orientations)-1)
+                self.roadno = random.randint(0, len(self.intersection.adjacent_road_bounding_orientations) - 1)
             else:
                 self.roadno = 0
 
-        orientation = (self.intersection.adjacent_road_orientations[self.roadno] + self.intersection.adjacent_road_bounding_orientations[self.roadno][0])/2
+        goal_road_orientation = (self.intersection.adjacent_road_orientations[self.roadno] +
+                                 self.intersection.adjacent_road_bounding_orientations[self.roadno][0]) / 2
         globalx, globaly = self.intersection.local_to_global_location_conversion((self.x, self.y))
-        destination = (self.intersection.center[0] + math.cos(orientation) * self.intersection.radius*1.1,
-                       self.intersection.center[1] + math.sin(orientation) * self.intersection.radius*1.1)
-        accel_vector = (destination[0] - globalx, destination[1] - globaly)
-        # self.ax = accel_vector[0]*2
-        # self.ay = accel_vector[1]*2
+        destination = (self.intersection.center[0] + math.cos(goal_road_orientation) * self.intersection.radius * 1.1,
+                       self.intersection.center[1] + math.sin(goal_road_orientation) * self.intersection.radius * 1.1)
+        goal_orientation = math.tan(globaly - destination[1] / globalx - destination[0])
 
-        # self.vx += self.ax * ticktime_ms / 1000
-        # self.vy += self.ay * ticktime_ms / 1000
-        self.orientation = math.tan(accel_vector[1] / accel_vector[0])
-        self.vx = accel_vector[0]/abs(accel_vector[0])*2
-        self.vy = accel_vector[1]/abs(accel_vector[1])*2
+
+        orientation_inc = min(abs(self.orientation - goal_orientation), 0)
+        orientation_inc = orientation_inc * (self.orientation - goal_orientation) / abs(
+            self.orientation - goal_orientation)
+
+        #self.orientation -= orientation_inc
+        velocity = math.sqrt(self.vx ** 2 + self.vy ** 2)
+
+        # should be self.orientation once vx, vy translation is fixed
+        self.vx = velocity * math.cos(self.orientation)
+        self.vy = velocity * math.sin(self.orientation)
         return self.x + self.vx * ticktime_ms / 1000, self.y + self.vy * ticktime_ms / 1000
 
     def compute_next_location(self, ticktime_ms):
@@ -309,20 +319,33 @@ class Vehicle:
 
         self.y = y
 
-    def respond_vehicle_slowdown(self, other_vehicle):
+    def respond_vehicle(self, other_vehicle):
         """
         calculates slowdown required not to crash
+        also calculates proper braking force required to not crash
         :param other_vehicle:
-        :return: float
+        :return: float, float
         """
         timeuntil = self.compute_following_time(other_vehicle)
         direction = self.correct_direction()
 
+        slowdown = 0
+        braking = 0
+        # compute slowdown
         if 0 <= timeuntil:
             if self.x * direction < other_vehicle.x * direction:
-                return (self.drivertype.following_time / timeuntil) * abs(self.vx - other_vehicle.vx) / timeuntil
+                slowdown = (self.drivertype.following_time / timeuntil) * abs(self.vx - other_vehicle.vx) / timeuntil
 
-        return 0
+        # compute braking
+        if 0 <= timeuntil <= self.drivertype.following_time:
+            if self.x * direction < other_vehicle.x * direction:
+                braking = min(
+                    (1 + self.drivertype.over_braking_factor * self.drivertype.following_time / timeuntil) * abs(
+                        self.vx - other_vehicle.vx) / timeuntil, self.cartype.max_brake_decel)
+            else:
+                braking = 0
+
+        return slowdown, braking
 
     def respond_vehicle_brake(self, other_vehicle):
         """
@@ -334,17 +357,6 @@ class Vehicle:
         """
         timeuntil = self.compute_following_time(other_vehicle)
         direction = self.correct_direction()
-
-        if 0 <= timeuntil <= self.drivertype.following_time:
-            if self.x * direction < other_vehicle.x * direction:
-                return min(
-                    (1 + self.drivertype.over_braking_factor * self.drivertype.following_time / timeuntil) * abs(
-                        self.vx - other_vehicle.vx) / timeuntil, self.cartype.max_brake_decel)
-            else:
-                return 0
-
-        else:
-            return 0
 
     def collided(self, other_vehicle):
         """
