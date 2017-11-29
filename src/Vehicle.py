@@ -5,6 +5,7 @@ import math
 from src.vehicles.VehicleTemplate import VehicleTemplate
 from src.drivers.DriverTemplate import DriverTemplate
 
+
 class Vehicle:
     class VehicleNeighbors:
 
@@ -229,7 +230,8 @@ class Vehicle:
         else:
             # compute acceleration as sum of desired accel and slowdown
             if self.road.speed_limit + self.drivertype.speeding_offset > abs(self.vx):
-                self.ax = direction * min((self.road.speed_limit - abs(self.vx)) / self.drivertype.accel_time,
+                self.ax = direction * min((self.road.speed_limit + self.drivertype.speeding_offset - abs(
+                    self.vx)) / self.drivertype.accel_time,
                                           self.drivertype.max_accel)
                 # make sure slowdown does not cause braking
                 self.ax += -slowdown_decel * direction
@@ -242,6 +244,15 @@ class Vehicle:
         self.vy = 0
         # return next position based on vx, vy
         return self.x + self.vx * ticktime_ms / 1000, self.y + self.vy * ticktime_ms / 1000
+
+    def compute_goal_orientation(self):
+        goal_road_orientation = (self.intersection.adjacent_road_orientations[self.roadno] +
+                                 self.intersection.adjacent_road_bounding_orientations[self.roadno][0]) / 2
+        globalx, globaly = self.intersection.local_to_global_location_conversion((self.x, self.y))
+        destination = (self.intersection.center[0] + math.cos(goal_road_orientation) * self.intersection.radius * 1.1,
+                       self.intersection.center[1] + math.sin(goal_road_orientation) * self.intersection.radius * 1.1)
+
+        return math.atan2(-(globaly - destination[1]),-(globalx - destination[0]))
 
     def compute_next_location_intersection(self, ticktime_ms):
         """
@@ -258,22 +269,24 @@ class Vehicle:
             else:
                 self.roadno = 0
 
-        goal_road_orientation = (self.intersection.adjacent_road_orientations[self.roadno] +
-                                 self.intersection.adjacent_road_bounding_orientations[self.roadno][0]) / 2
-        globalx, globaly = self.intersection.local_to_global_location_conversion((self.x, self.y))
-        destination = (self.intersection.center[0] + math.cos(goal_road_orientation) * self.intersection.radius * 1.1,
-                       self.intersection.center[1] + math.sin(goal_road_orientation) * self.intersection.radius * 1.1)
-        goal_orientation = math.tan(globaly - destination[1] / globalx - destination[0])
+        goal_orientation = self.compute_goal_orientation()
 
+        if self.vx != 0:
+            self.orientation = math.atan2(self.vy,self.vx)
 
-        orientation_inc = min(abs(self.orientation - goal_orientation), 0)
-        orientation_inc = orientation_inc * (self.orientation - goal_orientation) / abs(
+        orientation_inc = min(abs(self.orientation - goal_orientation), self.cartype.max_turn_rad_per_sec)
+        if orientation_inc != 0:
+            orientation_inc = orientation_inc * (self.orientation - goal_orientation) / abs(
             self.orientation - goal_orientation)
 
-        #self.orientation -= orientation_inc
+        self.orientation -= orientation_inc
         velocity = math.sqrt(self.vx ** 2 + self.vy ** 2)
-
-        # should be self.orientation once vx, vy translation is fixed
+        if self.intersection.speed_limit + self.drivertype.speeding_offset > abs(self.vx):
+            velocity += min(
+                (self.intersection.speed_limit + self.drivertype.speeding_offset - abs(self.vx)) / self.drivertype.accel_time,
+                self.drivertype.max_accel) * ticktime_ms / 1000
+        else:
+            velocity -= self.cartype.max_brake_decel * ticktime_ms/1000
         self.vx = velocity * math.cos(self.orientation)
         self.vy = velocity * math.sin(self.orientation)
         return self.x + self.vx * ticktime_ms / 1000, self.y + self.vy * ticktime_ms / 1000

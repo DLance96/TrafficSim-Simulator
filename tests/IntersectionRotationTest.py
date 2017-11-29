@@ -13,7 +13,7 @@ from src.drivers.DriverTemplate import SlowDriver
 from src.vehicles.VehicleTemplate import Ferrari
 
 trafficmap = TrafficMap()
-onlyroad = Road([400,200], 600, 2, 2, 3.14/10, 50, .01)
+onlyroad = Road([400,200], 600, 2, 2, 3.14/10, 50)
 initial_intersection = Intersection(center = (200, 220), radius = 300, speed_limit = 200)
 terminal_intersection = Intersection(center = (1100, 220), radius = 300, speed_limit = 200)
 initial_intersection.bind_road_to_intersection(onlyroad,'terminal')

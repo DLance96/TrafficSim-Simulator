@@ -83,6 +83,12 @@ class DisplayController:
         for intersection in traffic_map.get_intersections():
             for vehicle in intersection.vehicles:
                 self.drawVehicle(intersection, vehicle)
+                startpos = vehicle.intersection.local_to_global_location_conversion((vehicle.x, vehicle.y))
+                endpos = (startpos[0] + 20*math.cos(vehicle.compute_goal_orientation()),startpos[1] + 20*math.sin(vehicle.compute_goal_orientation()))
+
+                pygame.draw.line(self.draw_surface, Color(255,0,0),startpos, endpos, 1)
+
+
 
         for road in traffic_map.get_roads():
             for vehicle in road.vehicles:
