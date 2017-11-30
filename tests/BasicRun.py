@@ -26,6 +26,6 @@ terminal_intersection.bind_road_to_intersection(onlyroad,'initial')
 trafficmap.roadlist.append(onlyroad)
 trafficmap.intersectionlist.append(initial_intersection)
 trafficmap.intersectionlist.append(terminal_intersection)
-controller = SimulationController(trafficmap, 100, 100, 60)
+controller = SimulationController(trafficmap, 40, 100, 60)
 
 controller.run()
