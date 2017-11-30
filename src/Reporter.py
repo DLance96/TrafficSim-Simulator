@@ -91,7 +91,7 @@ class Reporter:
                 f.write("Average Average Speed of Vehicles in the Intersection\n")
                 f.write(str(sum(avg_speed_numbers)/len(avg_speed_numbers)) + '\n')
                 f.write("Average Number of Crashes in the Intersection\n")
-                f.write(str(sum(crash_numbers)/len(crash_numbers)) + '\n')
+                f.write(str(sum(crash_numbers)) + '\n')
             f.write("Roads\n")
             print(len(self.road_report_table.items()))
             for name, report in self.road_report_table.items():
@@ -103,5 +103,5 @@ class Reporter:
                 f.write("Average - Average Speed of Vehicles on the Road\n")
                 f.write(str(sum(avg_speed_numbers)/len(avg_speed_numbers)) + '\n')
                 f.write("Average Number of Crashes on the Road\n")
-                f.write(str(sum(crash_numbers)/len(crash_numbers)) + '\n')
+                f.write(str(sum(crash_numbers)) + '\n')
         return
