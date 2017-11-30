@@ -23,8 +23,6 @@ class Road(Surface):
         :param orientatino: double (IN RADIANS!)
         :param speed_limit: int
         """
-        # Brett wants this added at some point for pathfinding
-        # self.name = name
         self.anchor = anchor_corner
         self.length = length
         self.inbound_lanes = inbound_lanes
