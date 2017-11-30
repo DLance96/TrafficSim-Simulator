@@ -62,6 +62,8 @@ class SimulationController:
             self.tock()
             self.display_controller.render(self.traffic_map)
 
+        self.report()
+
     def tick(self):
         """
         :return: None

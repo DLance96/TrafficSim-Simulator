@@ -81,6 +81,7 @@ class Reporter:
         with open(output + '.txt', "w+") as f:
             f.write("Traffic System Report\n")
             f.write("Intersections\n")
+            print(len(self.intersection_report_table.items()))
             for name, report in self.intersection_report_table.items():
                 f.write("" + name + "\n")
                 vehicle_numbers, avg_speed_numbers, crash_numbers = report.read()
@@ -92,6 +93,7 @@ class Reporter:
                 f.write("Number of Crashes in the Intersection\n")
                 f.write(str(sum(crash_numbers)/len(crash_numbers)) + '\n')
             f.write("Roads\n")
+            print(len(self.road_report_table.items()))
             for name, report in self.road_report_table.items():
                 f.write("" + name + "\n")
                 vehicle_numbers, avg_speed_numbers, crash_numbers = report.read()

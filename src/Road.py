@@ -73,12 +73,13 @@ class Road(Surface):
         """
 
         crashes = self.process_collisions()
-        number_of_vehicles = len(self.vehicles)
-        if len(self.vehicles) > 0:
-            avg_speed = sum([math.sqrt(v.vx ** 2 + v.vy ** 2) for v in self.vehicles]) / len(self.vehicles)
-        else:
-            avg_speed = "NAN"
-        self.reporter.add_info_road(self.name, number_of_vehicles, avg_speed, crashes)
+        if self.reporter is not None:
+            number_of_vehicles = len(self.vehicles)
+            if len(self.vehicles) > 0:
+                avg_speed = sum([math.sqrt(v.vx ** 2 + v.vy ** 2) for v in self.vehicles]) / len(self.vehicles)
+            else:
+                avg_speed = "NAN"
+            self.reporter.add_info_road(self.name, number_of_vehicles, avg_speed, crashes)
 
         return
 
