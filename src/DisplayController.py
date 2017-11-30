@@ -20,6 +20,7 @@ class DisplayController:
         self.display_zoom = self.display_size
         self.debug_intersection = True
         self.debug_road = True
+        self.debug_road_aware = False
 
     def transform(self, keys_down):
         """
@@ -62,7 +63,19 @@ class DisplayController:
                 position = road.local_to_global_location_conversion((vehicle.x,vehicle.y))
                 decel_text = monospace.render(
                     "acel " + str(int(100*vehicle.ax*vehicle.correct_direction())/100), 1, (255*(vehicle.ax*vehicle.correct_direction() <= 0), 255*(vehicle.ax*vehicle.correct_direction() > 0), 0))
-                self.draw_surface.blit(decel_text, position)
+                self.draw_surface.blit(decel_text, (position[0], position[1]-20))
+                awarelist,slowdownlist, brakelist = vehicle.debug_show_response_vehicle()
+
+                if self.debug_road_aware:
+                    for other_vehicle_position in awarelist:
+                        pygame.draw.line(self.draw_surface, Color(0, 255, 0), position, other_vehicle_position, 1)
+
+                for other_vehicle_position in slowdownlist:
+                    pygame.draw.line(self.draw_surface, Color(255, 255, 0), position, other_vehicle_position, 1)
+
+                for other_vehicle_position in brakelist:
+                    pygame.draw.line(self.draw_surface, Color(255, 0, 0), position, other_vehicle_position, 1)
+
 
     def render_intersection_debug(self, traffic_map):
         """
