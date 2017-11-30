@@ -1,6 +1,7 @@
 import random
 from src.drivers.DriverTemplate import *
 from src.vehicles.VehicleTemplate import *
+from src.Reporter import Reporter
 
 class TrafficMap:
     """
@@ -10,14 +11,19 @@ class TrafficMap:
 
         self.roadlist = []
         self.intersectionlist = []
+        self.reporter = Reporter()
 
     def add_road(self, road):
         road.set_name(len(self.roadlist))
+        road.set_reporter(self.reporter)
+        self.reporter.create_road_entry(len(self.roadlist))
         self.roadlist.append(road)
         return
 
     def add_intersection(self, intersection):
         intersection.set_name(len(self.intersectionlist))
+        intersection.set_reporter(self.reporter)
+        self.reporter.create_intersection_entry(len(self.intersectionlist))
         self.intersectionlist.append(intersection)
 
     def get_roads(self):
@@ -38,20 +44,6 @@ class TrafficMap:
         """
         :type ticktime_ms: float
         :return: None
-        """
-        """
-        for i in range(len(self.roadlist)):
-            if self.roadlist[i].chance_spawn >= random.random():
-                if random.random() > .5:
-                    if random.randint(0, 1):
-                        self.roadlist[i].spawn(VehicleTemplate(),DriverTemplate(),'outbound')
-                    else:
-                        self.roadlist[i].spawn(VehicleTemplate(),DriverTemplate(),'inbound')
-                else:
-                    if random.randint(0, 1):
-                        self.roadlist[i].spawn(VehicleTemplate(), SlowDriver(),'outbound')
-                    else:
-                        self.roadlist[i].spawn(VehicleTemplate(), SlowDriver(), 'inbound')
         """
         for i in range(len(self.roadlist)):
             self.roadlist[i].tick(ticktime_ms)
@@ -75,3 +67,9 @@ class TrafficMap:
 
         for i in range(len(self.intersectionlist)):
             self.intersectionlist[i].tock_crashes()
+
+    def report(self, compact = True, output_file = None):
+        if compact:
+            self.reporter.generate_compact_report(output_file)
+        else:
+            self.reporter.generate_complete_report(output_file)

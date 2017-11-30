@@ -36,6 +36,7 @@ class Intersection(Surface):
         self.adjacent_road_bounding_orientations = []
         self.next_locations = [] # Prevents conflicts with cars being moved between tick and tock.
         self.name = None
+        self.reporter = None
         # Does this intersection have a stoplight?
         # If there is a stoplight
         if self.traffic_cycle is not None:
@@ -103,11 +104,18 @@ class Intersection(Surface):
 
     def tock_crashes(self):
         """
-        Performs the crash detecting and handling tock
+        Performs the crash detecting and handling tock, files the timestep report with the reporter
         :return:
         """
 
-        self.process_collisions()
+        crashes = self.process_collisions()
+        if self.reporter is not None:
+            number_of_vehicles = len(self.vehicles)
+            if len(self.vehicles) > 0:
+                avg_speed = sum([math.sqrt(v.vx ** 2 + v.vy ** 2) for v in self.vehicles]) / len(self.vehicles)
+            else:
+                avg_speed = "NAN"
+            self.reporter.add_info_intersection(self.name, number_of_vehicles, avg_speed, crashes)
 
         return
 
@@ -227,16 +235,17 @@ class Intersection(Surface):
         Discovers which vehicles have crashed and informs them.
         :return:
         """
-
+        count = 0
         vehicle_pairs = list(itertools.combinations(self.vehicles, 2))
         for (v1, v2) in vehicle_pairs:
             if self.have_collided(v1, v2):
+                count += 1
                 pass
                 # I am assuming that vehicles will want to know which vehicle they collided with.
                 v1.collided(v2)
                 v2.collided(v1)
 
-        return
+        return count
 
     def spawn(self, vehicle_template=VehicleTemplate(), driver_template=DriverTemplate()):
         """
@@ -329,6 +338,9 @@ class Intersection(Surface):
 
     def get_name(self):
         return self.name
+
+    def set_reporter(self, reporter):
+        self.reporter = reporter
 
     def status_of_light(self, road):
         """

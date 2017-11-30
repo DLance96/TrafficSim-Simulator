@@ -23,8 +23,6 @@ class Road(Surface):
         :param orientatino: double (IN RADIANS!)
         :param speed_limit: int
         """
-        # Brett wants this added at some point for pathfinding
-        # self.name = name
         self.anchor = anchor_corner
         self.length = length
         self.inbound_lanes = inbound_lanes
@@ -45,6 +43,7 @@ class Road(Surface):
         self.surface = self.generate_surface()
         self.next_locations = [] # Prevents conflicts with cars being moved onto roads between tick and tock.
         self.name = None
+        self.reporter = None
 
     def tick(self, ticktime_ms):
         """
@@ -69,11 +68,18 @@ class Road(Surface):
 
     def tock_crashes(self):
         """
-        Performs the crash detecting and handling tock
+        Performs the crash detecting and handling tock, files the timestep report with the reporter
         :return:
         """
 
-        self.process_collisions()
+        crashes = self.process_collisions()
+        if self.reporter is not None:
+            number_of_vehicles = len(self.vehicles)
+            if len(self.vehicles) > 0:
+                avg_speed = sum([math.sqrt(v.vx ** 2 + v.vy ** 2) for v in self.vehicles]) / len(self.vehicles)
+            else:
+                avg_speed = "NAN"
+            self.reporter.add_info_road(self.name, number_of_vehicles, avg_speed, crashes)
 
         return
 
@@ -271,7 +277,7 @@ class Road(Surface):
         Locates those vehicles which have been in a collision and informs them of that fact.
         :return:
         """
-
+        count = 0
         for bucket in self.bucket_list:
             preceding = [] if bucket.get_previous_bucket() == None else bucket.get_previous_bucket().get_vehicles()
             following = [] if bucket.get_next_bucket() == None else bucket.get_next_bucket().get_vehicles()
@@ -280,13 +286,14 @@ class Road(Surface):
             vehicle_pairs = list(itertools.combinations(vehicle_list, 2))
             for (v1, v2) in vehicle_pairs:
                 if self.have_collided(v1, v2):
+                    count += 1
                     pass
                     # I am assuming that vehicles will want to know which vehicle they collided with.
                     v1.collided(v2)
                     v2.collided(v1)
 
 
-        return
+        return count
 
     def add_neighboring_intersection(self, intersection, end):
         """
@@ -308,3 +315,6 @@ class Road(Surface):
 
     def get_name(self):
         return self.name
+
+    def set_reporter(self, reporter):
+        self.reporter = reporter
