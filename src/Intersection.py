@@ -12,7 +12,7 @@ class Intersection(Surface):
 
     lane_width = 10
 
-    def __init__(self, center, radius, speed_limit, template_factory = None):
+    def __init__(self, center, radius, speed_limit, template_factory = None, traffic_cycle = None):
         """
         :param anchor_corner: [double, double]
         :param length: double
@@ -26,6 +26,7 @@ class Intersection(Surface):
         self.speed_limit = speed_limit
         self.vehicles = []
         self.spawning_profile = template_factory
+        self.traffic_cycle = traffic_cycle
         # These lists are all same-indexed
         # Roads are ordered by orientation
         self.adjacent_roads = []
@@ -35,6 +36,23 @@ class Intersection(Surface):
         self.adjacent_road_bounding_orientations = []
         self.next_locations = [] # Prevents conflicts with cars being moved between tick and tock.
         self.name = None
+        # Does this intersection have a stoplight?
+        # If there is a stoplight
+        if self.traffic_cycle is not None:
+            # Get the list of lights which are green and how long they will be green for.
+            self.current_greens, self.time_until_transition = self.traffic_cycle.get_next()
+            # Figure out how long lights will be yellow for
+            self.yellow_duration = self.traffic_cycle.get_yellow_duration()
+            # If the lights are created with less time than the yellow duration, the are created yellow (poor drivers)
+            if self.time_until_transition <= self.yellow_duration:
+                self.yellow = True
+            else:
+                self.yellow = False
+        # If there is no stoplight
+        else:
+            # We can't set the current greens because we don't know at construction how many roads there will be
+            # Obviously the lights are not yellow if they don't exist
+            self.yellow = False
 
     def tick(self, ticktime_ms):
         """
@@ -43,8 +61,25 @@ class Intersection(Surface):
         :param ticktime_ms:
         :return:
         """
+        # Process the traffic cycle, potentially changing green lights to yellow or which lights are green.
+        if self.traffic_cycle is not None:
+            self.time_until_transition -= ticktime_ms
+            if self.time_until_transition <= 0:
+                # Get the list of lights which are green and how long they will be green for.
+                self.current_greens, self.time_until_transition = self.traffic_cycle.get_next()
+            # Check if the lights should be yellow
+            if self.time_until_transition <= self.yellow_duration:
+                self.yellow = True
+            else:
+                self.yellow = False
+        else:
+            # All roads have a "green light" if there is no stoplight
+            self.current_greens = range(len(self.adjacent_roads))
+            # And obviously the lights are not yellow if they don't exist
+            self.yellow = False
 
         self.next_locations = self.request_next_locations(ticktime_ms)
+
         if self.spawning_profile is not None:
             result = self.spawning_profile.prompt_spawn(ticktime_ms)
             if result is not None:
@@ -53,7 +88,6 @@ class Intersection(Surface):
                 # Vehicles really need pathfinding so that they leave the intersection.
                 # For now, vehicles are created in the middle of the intersection.
                 self.spawn(result[0], result[1])
-                pass
 
         return
 
@@ -295,3 +329,22 @@ class Intersection(Surface):
 
     def get_name(self):
         return self.name
+
+    def status_of_light(self, road):
+        """
+        Takes a road as an input and returns the status of the light for that road, "red", "yellow", or "green".
+        If the road is not one of the roads attached to the intersection a ValueError is raised
+        :param road:
+        :return:
+        """
+        if road in self.adjacent_roads:
+            index = self.adjacent_roads.index(road)
+            if index in self.current_greens:
+                if self.yellow:
+                    return "yellow"
+                else:
+                    return "green"
+            else:
+                return "red"
+        else:
+            raise ValueError("The given road is not one of the roads attached to this intersection.")
