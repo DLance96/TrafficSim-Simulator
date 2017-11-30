@@ -219,6 +219,7 @@ class Vehicle:
             slowdown_decel += new_slowdown
             brake_decel += new_brake
 
+        brake_decel += self.respond_intersection(ticktime_ms)
         brake_decel = min(brake_decel, self.cartype.max_brake_decel)
 
         # if need to brake
@@ -335,7 +336,19 @@ class Vehicle:
 
         self.y = y
 
-    def respond_intersection(self, intersection):
+    def respond_intersection(self, ticktime_ms):
+        if self.vx == 0:
+            return 0
+
+        relevant_intersection = self.road.terminal_intersection if self.correct_direction() == 1 else self.road.initial_intersection
+        intersection_speed = relevant_intersection.speed_limit if relevant_intersection.status_of_light(self.road) == 'green' else 0
+        relevantx = self.road.length if self.correct_direction() == 1 else 0
+        time_until = abs(self.x - relevantx) / abs(self.vx)
+
+        if time_until < self.drivertype.intersection_prep_time:
+            if time_until != 0 and abs(self.vx) > intersection_speed:
+                return abs(abs(self.vx) - intersection_speed)/time_until
+
         return 0
 
     def debug_show_response_vehicle(self):
