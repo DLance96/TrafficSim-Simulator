@@ -272,12 +272,14 @@ class Vehicle:
         goal_orientation = self.compute_goal_orientation()
 
         if self.vx != 0:
-            self.orientation = math.atan2(self.vy,self.vx)
-
-        orientation_inc = min(abs(self.orientation - goal_orientation), self.cartype.max_turn_rad_per_sec*ticktime_ms/1000)
-        if orientation_inc != 0:
-            orientation_inc = orientation_inc * (self.orientation - goal_orientation) / abs(
-            self.orientation - goal_orientation)
+            self.orientation = math.atan2(self.vy, self.vx)
+        self.orientation = self.orientation
+        orientation_delta = (self.orientation - goal_orientation)
+        orientation_delta = (orientation_delta + math.pi) % (2*math.pi) - math.pi
+        orientation_inc = min(abs(orientation_delta), self.cartype.max_turn_rad_per_sec*ticktime_ms/1000)
+        if orientation_delta != 0:
+            orientation_inc = orientation_inc * orientation_delta / abs(
+                orientation_delta)
 
         self.orientation -= orientation_inc
         velocity = math.sqrt(self.vx ** 2 + self.vy ** 2)
