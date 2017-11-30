@@ -14,16 +14,18 @@ class TrafficMap:
         self.reporter = Reporter()
 
     def add_road(self, road):
-        road.set_name(str(len(self.roadlist)))
+        road.set_name(len(self.roadlist))
         road.set_reporter(self.reporter)
-        self.reporter.create_road_entry(str(len(self.intersectionlist)))
+        self.reporter.create_road_entry(len(self.roadlist))
+        print(self.reporter.road_report_table.keys())
         self.roadlist.append(road)
         return
 
     def add_intersection(self, intersection):
-        intersection.set_name(str(len(self.intersectionlist)))
+        intersection.set_name(len(self.intersectionlist))
         intersection.set_reporter(self.reporter)
-        self.reporter.create_intersection_entry(str(len(self.intersectionlist)))
+        self.reporter.create_intersection_entry(len(self.intersectionlist))
+        print(self.reporter.intersection_report_table.keys())
         self.intersectionlist.append(intersection)
 
     def get_roads(self):
