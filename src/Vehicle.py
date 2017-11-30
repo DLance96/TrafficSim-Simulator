@@ -177,11 +177,12 @@ class Vehicle:
 
     def compute_following_time_road(self, vehicle):
         direction = self.correct_direction()
-        if abs(vehicle.y - self.y) * 2 > self.cartype.width + vehicle.cartype.width:
+        if abs(vehicle.y - self.y) > self.cartype.width + vehicle.cartype.width:
             return -1
+
         if 0 == self.vx:
             return -1
-        if self.vx * direction <= vehicle.vx * direction:
+        if self.vx * direction < vehicle.vx * direction:
             return -1;
         following_time = (abs(vehicle.x - self.x) - vehicle.cartype.length) / abs(self.vx)
 
@@ -252,7 +253,7 @@ class Vehicle:
         destination = (self.intersection.center[0] + math.cos(goal_road_orientation) * self.intersection.radius * 1.1,
                        self.intersection.center[1] + math.sin(goal_road_orientation) * self.intersection.radius * 1.1)
 
-        return math.atan2(-(globaly - destination[1]),-(globalx - destination[0]))
+        return math.atan2(-(globaly - destination[1]), -(globalx - destination[0]))
 
     def compute_next_location_intersection(self, ticktime_ms):
         """
@@ -263,7 +264,6 @@ class Vehicle:
        """
         # roadno is a placeholder that hsould be deleted
         if self.roadno == -1:
-            print(len(self.intersection.adjacent_road_bounding_orientations))
             if len(self.intersection.adjacent_road_bounding_orientations) > 1:
                 self.roadno = random.randint(0, len(self.intersection.adjacent_road_bounding_orientations) - 1)
             else:
@@ -272,21 +272,24 @@ class Vehicle:
         goal_orientation = self.compute_goal_orientation()
 
         if self.vx != 0:
-            self.orientation = math.atan2(self.vy,self.vx)
-
-        orientation_inc = min(abs(self.orientation - goal_orientation), self.cartype.max_turn_rad_per_sec*ticktime_ms/1000)
-        if orientation_inc != 0:
-            orientation_inc = orientation_inc * (self.orientation - goal_orientation) / abs(
-            self.orientation - goal_orientation)
+            self.orientation = math.atan2(self.vy, self.vx)
+        self.orientation = self.orientation
+        orientation_delta = (self.orientation - goal_orientation)
+        orientation_delta = (orientation_delta + math.pi) % (2 * math.pi) - math.pi
+        orientation_inc = min(abs(orientation_delta), self.cartype.max_turn_rad_per_sec * ticktime_ms / 1000)
+        if orientation_delta != 0:
+            orientation_inc = orientation_inc * orientation_delta / abs(
+                orientation_delta)
 
         self.orientation -= orientation_inc
         velocity = math.sqrt(self.vx ** 2 + self.vy ** 2)
         if self.intersection.speed_limit + self.drivertype.speeding_offset > abs(self.vx):
             velocity += min(
-                (self.intersection.speed_limit + self.drivertype.speeding_offset - abs(self.vx)) / self.drivertype.accel_time,
+                (self.intersection.speed_limit + self.drivertype.speeding_offset - abs(
+                    self.vx)) / self.drivertype.accel_time,
                 self.drivertype.max_accel) * ticktime_ms / 1000
         else:
-            velocity -= self.cartype.max_brake_decel * ticktime_ms/1000
+            velocity -= self.cartype.max_brake_decel * ticktime_ms / 1000
         self.vx = velocity * math.cos(self.orientation)
         self.vy = velocity * math.sin(self.orientation)
         return self.x + self.vx * ticktime_ms / 1000, self.y + self.vy * ticktime_ms / 1000
@@ -331,8 +334,42 @@ class Vehicle:
         self.x = x
 
         self.y = y
+
     def respond_intersection(self, intersection):
         return 0
+
+    def debug_show_response_vehicle(self):
+        slowdownlist = []
+        brakelist = []
+        awarelist = []
+        for vehicle in self.vehicle_neigbors.nearby_vehicles:
+            new_slowdown, new_brake = self.respond_vehicle(vehicle)
+            if new_brake > 0:
+                brakelist.append(self.road.local_to_global_location_conversion((vehicle.x, vehicle.y)))
+            elif new_slowdown > 0:
+                slowdownlist.append(self.road.local_to_global_location_conversion((vehicle.x, vehicle.y)))
+            else:
+                awarelist.append(self.road.local_to_global_location_conversion((vehicle.x, vehicle.y)))
+
+        for vehicle in self.vehicle_neigbors.vehicles_infront:
+            new_slowdown, new_brake = self.respond_vehicle(vehicle)
+            if new_brake > 0:
+                brakelist.append(self.road.local_to_global_location_conversion((vehicle.x, vehicle.y)))
+            elif new_slowdown > 0:
+                slowdownlist.append(self.road.local_to_global_location_conversion((vehicle.x, vehicle.y)))
+            else:
+                awarelist.append(self.road.local_to_global_location_conversion((vehicle.x, vehicle.y)))
+
+        for vehicle in self.vehicle_neigbors.vehicles_behind:
+            new_slowdown, new_brake = self.respond_vehicle(vehicle)
+            if new_brake > 0:
+                brakelist.append(self.road.local_to_global_location_conversion((vehicle.x, vehicle.y)))
+            elif new_slowdown > 0:
+                slowdownlist.append(self.road.local_to_global_location_conversion((vehicle.x, vehicle.y)))
+            else:
+                awarelist.append(self.road.local_to_global_location_conversion((vehicle.x, vehicle.y)))
+
+        return awarelist, slowdownlist, brakelist
 
     def respond_vehicle(self, other_vehicle):
         """
@@ -341,6 +378,9 @@ class Vehicle:
         :param other_vehicle:
         :return: float, float
         """
+        if other_vehicle is self:
+            return 0, 0
+
         timeuntil = self.compute_following_time(other_vehicle)
         direction = self.correct_direction()
 
@@ -351,14 +391,16 @@ class Vehicle:
             if self.x * direction < other_vehicle.x * direction:
                 slowdown = (self.drivertype.following_time / timeuntil) * abs(self.vx - other_vehicle.vx) / timeuntil
 
-        # compute braking
+        # compute braking based on time
         if 0 <= timeuntil <= self.drivertype.following_time:
             if self.x * direction < other_vehicle.x * direction:
-                braking = min(
-                    (1 + self.drivertype.over_braking_factor * self.drivertype.following_time / timeuntil) * abs(
-                        self.vx - other_vehicle.vx) / timeuntil, self.cartype.max_brake_decel)
-            else:
-                braking = 0
+                braking = (1 + self.drivertype.over_braking_factor * self.drivertype.following_time / timeuntil) * abs(
+                    self.vx - other_vehicle.vx) / timeuntil
+
+        # compute braking on following dist
+        if abs(self.x - other_vehicle.x) < other_vehicle.cartype.length * 2 and self.x * direction < other_vehicle.x * direction:
+            if abs(other_vehicle.y - self.y) <= self.cartype.width + other_vehicle.cartype.width:
+                braking = self.cartype.max_brake_decel
 
         return slowdown, braking
 
