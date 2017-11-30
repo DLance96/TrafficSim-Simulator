@@ -177,7 +177,7 @@ class Road(Surface):
         x = self.anchor[0] + location[0] * math.cos(self.orientation) + location[1] * math.cos(self.orientation + math.pi / 2)
         y = self.anchor[1] + location[0] * math.sin(self.orientation) + location[1] * math.sin(self.orientation + math.pi / 2)
 
-        return [x, y]
+        return (x, y)
 
     def global_to_local_location_conversion(self, location):
         """
@@ -193,7 +193,7 @@ class Road(Surface):
         local_x = relative_x * math.cos(-self.orientation) - relative_y * math.sin(-self.orientation)
         local_y = relative_y * math.cos(-self.orientation) + relative_x * math.sin(-self.orientation)
 
-        return [local_x, local_y]
+        return (local_x, local_y)
 
     def which_neighbor(self, location):
         """
