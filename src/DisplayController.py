@@ -18,6 +18,8 @@ class DisplayController:
         self.xoffset = 0
         self.yoffset = 0
         self.display_zoom = self.display_size
+        self.debug_intersection = True
+        self.debug_road = True
 
     def transform(self, keys_down):
         """
@@ -53,13 +55,56 @@ class DisplayController:
                 # self.xoffset += self.display_size[0] / scale_factor / 2
                 # self.yoffset += self.display_size[1] / scale_factor / 2
 
+    def render_road_debug(self, traffic_map):
+        for road in traffic_map.get_roads():
+            for vehicle in road.vehicles:
+                monospace = pygame.font.SysFont("monospace", 15)
+                position = road.local_to_global_location_conversion((vehicle.x,vehicle.y))
+                decel_text = monospace.render(
+                    "acel " + str(int(100*vehicle.ax*vehicle.correct_direction())/100), 1, (255*(vehicle.ax*vehicle.correct_direction() <= 0), 255*(vehicle.ax*vehicle.correct_direction() > 0), 0))
+                self.draw_surface.blit(decel_text, position)
+
+    def render_intersection_debug(self, traffic_map):
+        """
+        draws debug stuff for intersections
+
+        :param traffic_map:
+        :return:
+        """
+        for intersection in traffic_map.get_intersections():
+            for vehicle in intersection.vehicles:
+                monospace = pygame.font.SysFont("monospace", 15)
+                startpos = vehicle.intersection.local_to_global_location_conversion((vehicle.x, vehicle.y))
+                endpos_goal = (startpos[0] + 20*math.cos(vehicle.compute_goal_orientation()),startpos[1] + 20*math.sin(vehicle.compute_goal_orientation()))
+                endpos_current = (startpos[0] + 20*math.cos(vehicle.orientation),startpos[1] + 20*math.sin(vehicle.orientation))
+
+                pygame.draw.line(self.draw_surface, Color(255, 255, 0), startpos, endpos_current, 1)
+                pygame.draw.line(self.draw_surface, Color(255,0,0),startpos, endpos_goal, 1)
+
+                current_orientation_text = monospace.render("current "+str(int(100*vehicle.orientation/(2*math.pi))/100), 1, (255, 255, 0))
+                self.draw_surface.blit(current_orientation_text, startpos)
+                goal_orientationtext = monospace.render("goal "+str(int(100*vehicle.compute_goal_orientation()/(2*math.pi))/100), 1, (255, 0, 255))
+                self.draw_surface.blit(goal_orientationtext, (startpos[0],startpos[1]-20))
+
+        for intersection in traffic_map.get_intersections():
+            for angle in intersection.adjacent_road_orientations:
+                pygame.draw.circle(self.draw_surface, Color(255, 120, 70),
+                                   (int(intersection.center[0] + math.cos(angle) * intersection.radius),
+                                    int(intersection.center[1] + math.sin(angle) * intersection.radius)), 4)
+
+        for intersection in traffic_map.get_intersections():
+            for value, angles in enumerate(intersection.adjacent_road_bounding_orientations):
+                for angle in angles:
+                    pygame.draw.circle(self.draw_surface,
+                                       Color(int(100 / (value + 1)), int(250 / (value + 1)), int(250 / (value + 1))),
+                                       (int(intersection.center[0] + math.cos(angle) * intersection.radius),
+                                        int(intersection.center[1] + math.sin(angle) * intersection.radius)), 4)
     def render(self, traffic_map):
         """
         :param traffic_map: traffic map to be rendered
         :type traffic_map: TrafficMap
         :rtype: None
         """
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -83,31 +128,17 @@ class DisplayController:
         for intersection in traffic_map.get_intersections():
             for vehicle in intersection.vehicles:
                 self.drawVehicle(intersection, vehicle)
-                startpos = vehicle.intersection.local_to_global_location_conversion((vehicle.x, vehicle.y))
-                endpos = (startpos[0] + 20*math.cos(vehicle.compute_goal_orientation()),startpos[1] + 20*math.sin(vehicle.compute_goal_orientation()))
-
-                pygame.draw.line(self.draw_surface, Color(255,0,0),startpos, endpos, 1)
-
 
 
         for road in traffic_map.get_roads():
             for vehicle in road.vehicles:
                 self.drawVehicle(road, vehicle)
 
-        for intersection in traffic_map.get_intersections():
-            for angle in intersection.adjacent_road_orientations:
-                pygame.draw.circle(self.draw_surface, Color(255, 120, 70),
-                                   (int(intersection.center[0] + math.cos(angle) * intersection.radius),
-                                    int(intersection.center[1] + math.sin(angle) * intersection.radius)), 4)
+        if self.debug_intersection:
+            self.render_intersection_debug(traffic_map)
 
-        for intersection in traffic_map.get_intersections():
-            for value, angles in enumerate(intersection.adjacent_road_bounding_orientations):
-                for angle in angles:
-                    pygame.draw.circle(self.draw_surface,
-                                       Color(int(100 / (value + 1)),int(250 / (value + 1)),int(250 / (value + 1))),
-                                       (int(intersection.center[0] + math.cos(angle) * intersection.radius),
-                                        int(intersection.center[1] + math.sin(angle) * intersection.radius)), 4)
-
+        if self.debug_road:
+            self.render_road_debug(traffic_map)
 
         temp_surface = pygame.transform.scale(self.draw_surface, tuple(map(int, self.display_zoom)))
         self.display_surface.blit(temp_surface, temp_surface.get_rect().move(self.xoffset, self.yoffset))
