@@ -73,3 +73,10 @@ class SimulationController:
         :return: None
         """
         self.traffic_map.tock(self.ticktime_ms)
+
+    def report(self):
+        """
+        Instructs the TrafficMap to generate its report
+        :return:
+        """
+        self.traffic_map.report()
