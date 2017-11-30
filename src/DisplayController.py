@@ -108,6 +108,25 @@ class DisplayController:
                                        (int(intersection.center[0] + math.cos(angle) * intersection.radius),
                                         int(intersection.center[1] + math.sin(angle) * intersection.radius)), 4)
 
+        for intersection in traffic_map.get_intersections():
+            for road_index, road in enumerate(intersection.adjacent_roads):
+                angles = intersection.adjacent_road_bounding_orientations[road_index]
+                point1 = (int(intersection.center[0] + math.cos(angles[0]) * intersection.radius),
+                                        int(intersection.center[1] + math.sin(angles[0]) * intersection.radius))
+                point2 = (int(intersection.center[0] + math.cos(angles[1]) * intersection.radius),
+                                        int(intersection.center[1] + math.sin(angles[1]) * intersection.radius))
+                light_status = intersection.status_of_light(road)
+                if light_status == "green":
+                    color = Color(0, 255, 0)
+                elif light_status == "yellow":
+                    color = Color(255, 255, 0)
+                elif light_status == "red":
+                    color = Color(255, 0, 0)
+                else:
+                    raise ValueError("The status of a light should be 'red', 'yellow', or 'green'.")
+                pygame.draw.line(self.draw_surface, color, point1, point2, 3)
+
+
 
         temp_surface = pygame.transform.scale(self.draw_surface, tuple(map(int, self.display_zoom)))
         self.display_surface.blit(temp_surface, temp_surface.get_rect().move(self.xoffset, self.yoffset))
