@@ -81,9 +81,8 @@ class Reporter:
         with open(output + '.txt', "w+") as f:
             f.write("Traffic System Report\n")
             f.write("Intersections\n")
-            print(len(self.intersection_report_table.items()))
             for name, report in self.intersection_report_table.items():
-                f.write(str(name) + "\n")
+                f.write("Intersection Name: " + str(name) + "\n")
                 vehicle_numbers, avg_speed_numbers, crash_numbers = report.read()
                 avg_speed_numbers = list(filter(lambda x: not x == "NAN", avg_speed_numbers))
                 f.write("Average Number of Vehicles in the Intersection\n")
@@ -93,9 +92,8 @@ class Reporter:
                 f.write("Number of Crashes in the Intersection\n")
                 f.write(str(sum(crash_numbers)) + '\n')
             f.write("Roads\n")
-            print(len(self.road_report_table.items()))
             for name, report in self.road_report_table.items():
-                f.write(str(name) + "\n")
+                f.write("Road Name: " + str(name) + "\n")
                 vehicle_numbers, avg_speed_numbers, crash_numbers = report.read()
                 avg_speed_numbers = list(filter(lambda x: not x == "NAN", avg_speed_numbers))
                 f.write("Average Number of Vehicles on the Road\n")
