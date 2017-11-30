@@ -67,6 +67,6 @@ trafficmap.add_intersection(lower_intersection)
 trafficmap.add_intersection(upper_intersection)
 trafficmap.add_intersection(right_intersection)
 
-controller = SimulationController(trafficmap, 200, 30, 60)
+controller = SimulationController(trafficmap, 200, 200, 60)
 
 controller.run()

@@ -142,10 +142,27 @@ class DisplayController:
             for vehicle in intersection.vehicles:
                 self.drawVehicle(intersection, vehicle)
 
-
         for road in traffic_map.get_roads():
             for vehicle in road.vehicles:
                 self.drawVehicle(road, vehicle)
+
+        for intersection in traffic_map.get_intersections():
+            for road_index, road in enumerate(intersection.adjacent_roads):
+                angles = intersection.adjacent_road_bounding_orientations[road_index]
+                point1 = (int(intersection.center[0] + math.cos(angles[0]) * intersection.radius),
+                                        int(intersection.center[1] + math.sin(angles[0]) * intersection.radius))
+                point2 = (int(intersection.center[0] + math.cos(angles[1]) * intersection.radius),
+                                        int(intersection.center[1] + math.sin(angles[1]) * intersection.radius))
+                light_status = intersection.status_of_light(road)
+                if light_status == "green":
+                    color = Color(0, 255, 0)
+                elif light_status == "yellow":
+                    color = Color(255, 255, 0)
+                elif light_status == "red":
+                    color = Color(255, 0, 0)
+                else:
+                    raise ValueError("The status of a light should be 'red', 'yellow', or 'green'.")
+                pygame.draw.line(self.draw_surface, color, point1, point2, 3)
 
         if self.debug_intersection:
             self.render_intersection_debug(traffic_map)
