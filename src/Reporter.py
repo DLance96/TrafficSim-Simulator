@@ -84,6 +84,7 @@ class Reporter:
             for name, report in self.intersection_report_table.items():
                 f.write("" + name + "\n")
                 vehicle_numbers, avg_speed_numbers, crash_numbers = report.read()
+                avg_speed_numbers = list(filter(lambda x: not x == "NAN", avg_speed_numbers))
                 f.write("Number of Vehicles in the Intersection\n")
                 f.write(str(sum(vehicle_numbers)/len(vehicle_numbers)) + '\n')
                 f.write("Average Speed of Vehicles in the Intersection\n")
@@ -94,6 +95,7 @@ class Reporter:
             for name, report in self.road_report_table.items():
                 f.write("" + name + "\n")
                 vehicle_numbers, avg_speed_numbers, crash_numbers = report.read()
+                avg_speed_numbers = list(filter(lambda x: not x == "NAN", avg_speed_numbers))
                 f.write("Number of Vehicles on the Road\n")
                 f.write(str(sum(vehicle_numbers)/len(vehicle_numbers)) + '\n')
                 f.write("Average Speed of Vehicles on the Road\n")
