@@ -21,7 +21,7 @@ class Reporter:
             return
 
         def read(self):
-            return self.number_of_vehicles, self.average_speed, self.number_of_crashes
+            return self.number_of_vehicles_list, self.average_speed_list, self.number_of_crashes_list
 
     def __init__(self):
 
@@ -83,7 +83,7 @@ class Reporter:
             f.write("Intersections\n")
             print(len(self.intersection_report_table.items()))
             for name, report in self.intersection_report_table.items():
-                f.write("" + name + "\n")
+                f.write(str(name) + "\n")
                 vehicle_numbers, avg_speed_numbers, crash_numbers = report.read()
                 avg_speed_numbers = list(filter(lambda x: not x == "NAN", avg_speed_numbers))
                 f.write("Number of Vehicles in the Intersection\n")
@@ -95,7 +95,7 @@ class Reporter:
             f.write("Roads\n")
             print(len(self.road_report_table.items()))
             for name, report in self.road_report_table.items():
-                f.write("" + name + "\n")
+                f.write(str(name) + "\n")
                 vehicle_numbers, avg_speed_numbers, crash_numbers = report.read()
                 avg_speed_numbers = list(filter(lambda x: not x == "NAN", avg_speed_numbers))
                 f.write("Number of Vehicles on the Road\n")
