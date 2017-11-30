@@ -23,6 +23,8 @@ class VehicleTemplate:
         # maximum speed of vehicle
         self.max_speed = 200
 
+        self.max_turn_rad_per_sec = 3
+
         self.color = Color(255, 100, 100)
 
 class Ferrari(VehicleTemplate):

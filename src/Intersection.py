@@ -1,6 +1,10 @@
 import math
 import itertools
 from src.Surface import Surface
+from src.Vehicle import Vehicle
+from src.drivers.DriverTemplate import DriverTemplate
+from src.vehicles.VehicleTemplate import VehicleTemplate
+from itertools import repeat
 from collections import defaultdict
 
 
@@ -8,7 +12,7 @@ class Intersection(Surface):
 
     lane_width = 10
 
-    def __init__(self, center, radius, speed_limit):
+    def __init__(self, center, radius, speed_limit, template_factory = None, traffic_cycle = None):
         """
         :param center: [double, double]
         :param radius: double
@@ -18,6 +22,8 @@ class Intersection(Surface):
         self.radius = radius
         self.speed_limit = speed_limit
         self.vehicles = []
+        self.spawning_profile = template_factory
+        self.traffic_cycle = traffic_cycle
         # These lists are all same-indexed
         # Roads are ordered by orientation
         self.adjacent_roads = []
@@ -26,15 +32,59 @@ class Intersection(Surface):
         # List of tuples storing the bounds on the angle centered at the origin subtended by the road
         self.adjacent_road_bounding_orientations = []
         self.next_locations = [] # Prevents conflicts with cars being moved between tick and tock.
+        self.name = None
+        # Does this intersection have a stoplight?
+        # If there is a stoplight
+        if self.traffic_cycle is not None:
+            # Get the list of lights which are green and how long they will be green for.
+            self.current_greens, self.time_until_transition = self.traffic_cycle.get_next()
+            # Figure out how long lights will be yellow for
+            self.yellow_duration = self.traffic_cycle.get_yellow_duration()
+            # If the lights are created with less time than the yellow duration, the are created yellow (poor drivers)
+            if self.time_until_transition <= self.yellow_duration:
+                self.yellow = True
+            else:
+                self.yellow = False
+        # If there is no stoplight
+        else:
+            # We can't set the current greens because we don't know at construction how many roads there will be
+            # Obviously the lights are not yellow if they don't exist
+            self.yellow = False
 
     def tick(self, ticktime_ms):
         """
         Performs the vehicle next location getting tick
+        Spawns vehicles if appropriate
         :param ticktime_ms:
         :return:
         """
+        # Process the traffic cycle, potentially changing green lights to yellow or which lights are green.
+        if self.traffic_cycle is not None:
+            self.time_until_transition -= ticktime_ms
+            if self.time_until_transition <= 0:
+                # Get the list of lights which are green and how long they will be green for.
+                self.current_greens, self.time_until_transition = self.traffic_cycle.get_next()
+            # Check if the lights should be yellow
+            if self.time_until_transition <= self.yellow_duration:
+                self.yellow = True
+            else:
+                self.yellow = False
+        else:
+            # All roads have a "green light" if there is no stoplight
+            self.current_greens = range(len(self.adjacent_roads))
+            # And obviously the lights are not yellow if they don't exist
+            self.yellow = False
 
         self.next_locations = self.request_next_locations(ticktime_ms)
+
+        if self.spawning_profile is not None:
+            result = self.spawning_profile.prompt_spawn(ticktime_ms)
+            if result is not None:
+                # Code to implement converting the resulting vehicle and driver template into a vehicle
+                # and placing it onto the intersection
+                # Vehicles really need pathfinding so that they leave the intersection.
+                # For now, vehicles are created in the middle of the intersection.
+                self.spawn(result[0], result[1])
 
         return
 
@@ -130,7 +180,8 @@ class Intersection(Surface):
             neighbor.accept_transfer(vehicle, location)
             self.vehicles.remove(vehicle)
         except ValueError:
-            raise ValueError("A vehicle couldn't be transferred because it requested an invalid destination.")
+            print("A vehicle couldn't be transferred because it requested an invalid destination.")
+            self.vehicles.remove(vehicle)
 
         return
 
@@ -143,7 +194,7 @@ class Intersection(Surface):
         :param road:
         :return:
         """
-        road_orientation = road.orientation if side == "terminal" else (road.orientation + math.pi) % (2 * math.pi)
+        road_orientation = road.orientation
         self.vehicles.append(vehicle)
         local_location = self.global_to_local_location_conversion(location)
         vehicle.transfer_to_intersection(self, local_location, road_orientation)
@@ -184,16 +235,33 @@ class Intersection(Surface):
 
         return
 
-    def spawn(self, vehicle_template, driver_template, direction):
+    def spawn(self, vehicle_template=VehicleTemplate(), driver_template=DriverTemplate()):
         """
-        Takes the necessary inputs to generate a vehicle and generates the corresponding vehicles at a
-        random location in the intersection
+        Takes the necessary inputs to generate a vehicle and attempts to generate the corresponding vehicles in the
+        middle of the intersection in accordance with the spawning profile's frequency.
+        If this would cause a collision, the vehicle is instead not spawned.
         :param vehicle_template:
         :param driver_template:
         :param direction:
+        :param initx:
+        :param laneno:
         :return:
         """
+
+        spawned_vehicle = Vehicle(surface = self, x=0, y=0, vx=0, vy=0, orientation=0,
+                                cartype = vehicle_template,
+                                drivertype = driver_template)
+
+        # Check to see if the spawned vehicle collides with any vehicles currently in the intersection
+        spawning_collision = any(map(self.have_collided, self.vehicles, repeat(spawned_vehicle)))
+
+        if not spawning_collision:
+            self.vehicles.append(spawned_vehicle)
+
         return
+
+    def debug_spawn(self, vehicle):
+        self.vehicles.append(vehicle)
 
     def add_neighboring_road(self, road, side):
         """
@@ -252,3 +320,28 @@ class Intersection(Surface):
         road.add_neighboring_intersection(self, side)
         self.add_neighboring_road(road, side)
         return
+
+    def set_name(self, name):
+        self.name = name
+
+    def get_name(self):
+        return self.name
+
+    def status_of_light(self, road):
+        """
+        Takes a road as an input and returns the status of the light for that road, "red", "yellow", or "green".
+        If the road is not one of the roads attached to the intersection a ValueError is raised
+        :param road:
+        :return:
+        """
+        if road in self.adjacent_roads:
+            index = self.adjacent_roads.index(road)
+            if index in self.current_greens:
+                if self.yellow:
+                    return "yellow"
+                else:
+                    return "green"
+            else:
+                return "red"
+        else:
+            raise ValueError("The given road is not one of the roads attached to this intersection.")

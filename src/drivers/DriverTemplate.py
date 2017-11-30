@@ -29,6 +29,8 @@ class DriverTemplate:
         # time interval to update neighbors
         self.update_time_ms = 30
 
+        self.intersection_prep_time = 6
+
         self.color = Color(255, 100, 100)
 
 

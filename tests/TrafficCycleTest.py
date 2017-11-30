@@ -10,6 +10,7 @@ from src.Intersection import Intersection
 from src.drivers.DriverTemplate import  DriverTemplate
 from src.vehicles.VehicleTemplate import VehicleTemplate
 from src.TemplatePairFactory import TemplatePairFactory
+from src.TrafficCycle import TrafficCycle
 
 # Create the trafficmap
 trafficmap = TrafficMap()
@@ -25,13 +26,21 @@ upper_left_road = Road([47, 373], 460, 2, 2, 7 * math.pi / 4, 50)
 
 # Create the 4 intersections
 upper_intersection = Intersection(center = (400, 50), radius = 30, speed_limit = 200,
-                                  template_factory = TemplatePairFactory(1000, prebuilt_list))
+                                  template_factory = TemplatePairFactory(1000, prebuilt_list),
+                                  traffic_cycle = TrafficCycle(green_lights = [[0], [1]], timings = [20000, 20000],
+                                                               yellow_light_length = 6000))
 right_intersection = Intersection(center = (400 + 353, 50 + 353), radius = 30, speed_limit = 200,
-                                  template_factory = TemplatePairFactory(1000, prebuilt_list))
+                                  template_factory = TemplatePairFactory(1000, prebuilt_list),
+                                  traffic_cycle=TrafficCycle(green_lights=[[0], [1]], timings=[20000, 20000],
+                                                             yellow_light_length=6000))
 lower_intersection = Intersection(center = (400, 50 + 2 * 353), radius = 30, speed_limit = 200,
-                                  template_factory = TemplatePairFactory(1000, prebuilt_list))
+                                  template_factory = TemplatePairFactory(1000, prebuilt_list),
+                                  traffic_cycle=TrafficCycle(green_lights=[[0], [1]], timings=[20000, 20000],
+                                                             yellow_light_length=6000))
 left_intersection = Intersection(center = (400 - 353, 50 + 353), radius = 30, speed_limit = 200,
-                                 template_factory = TemplatePairFactory(1000, prebuilt_list))
+                                 template_factory = TemplatePairFactory(1000, prebuilt_list),
+                                 traffic_cycle=TrafficCycle(green_lights=[[0], [1]], timings=[20000, 20000],
+                                                            yellow_light_length=6000))
 
 # For each of the intersections add the appropriate neighboring roads
 left_intersection.bind_road_to_intersection(lower_left_road, 'initial')

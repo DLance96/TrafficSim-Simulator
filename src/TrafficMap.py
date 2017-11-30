@@ -11,6 +11,15 @@ class TrafficMap:
         self.roadlist = []
         self.intersectionlist = []
 
+    def add_road(self, road):
+        road.set_name(len(self.roadlist))
+        self.roadlist.append(road)
+        return
+
+    def add_intersection(self, intersection):
+        intersection.set_name(len(self.intersectionlist))
+        self.intersectionlist.append(intersection)
+
     def get_roads(self):
         """
         :return: a list of all roads in the map

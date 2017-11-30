@@ -8,24 +8,24 @@ from src.Road import Road
 from src.Intersection import Intersection
 from src.drivers.DriverTemplate import  DriverTemplate
 from src.vehicles.VehicleTemplate import VehicleTemplate
+from src.TemplatePairFactory import TemplatePairFactory
 from src.drivers.DriverTemplate import SpeedoFerraro
 from src.drivers.DriverTemplate import SlowDriver
 from src.vehicles.VehicleTemplate import Ferrari
 
 trafficmap = TrafficMap()
-onlyroad = Road([200,200], 1000, 2, 2, 0, 50, .01)
-initial_intersection = Intersection(center = (200, 220), radius = 30, speed_limit = 200)
-terminal_intersection = Intersection(center = (1200, 220), radius = 30, speed_limit = 200)
+prebuilt_list = [((0, 1), DriverTemplate(),VehicleTemplate())]
+onlyroad = Road([200,200], 800, 2, 2, 0, 100)
+
+initial_intersection = Intersection(center = (100, 220), radius = 130, speed_limit = 10,
+                                    template_factory=TemplatePairFactory(10000, prebuilt_list))
+terminal_intersection = Intersection(center = (1100, 220), radius = 130, speed_limit = 10,
+                                     template_factory=TemplatePairFactory(10000, prebuilt_list))
 initial_intersection.bind_road_to_intersection(onlyroad,'terminal')
 terminal_intersection.bind_road_to_intersection(onlyroad,'initial')
 trafficmap.roadlist.append(onlyroad)
 trafficmap.intersectionlist.append(initial_intersection)
 trafficmap.intersectionlist.append(terminal_intersection)
-controller = SimulationController(trafficmap, 20, 100, 60)
-onlyroad.spawn(Ferrari(), SpeedoFerraro(), "outbound", initx=0, laneno=0)
-onlyroad.spawn(VehicleTemplate(), SlowDriver(), "outbound", initx=500, laneno=0)
-onlyroad.spawn(Ferrari(), SpeedoFerraro(), "inbound", initx=0, laneno=0)
-onlyroad.spawn(VehicleTemplate(), SlowDriver(), "inbound", initx=500, laneno=0)
+controller = SimulationController(trafficmap, 40, 100, 60)
 
-#onlyroad.spawn(VehicleTemplate(), DriverTemplate(), "inbound")
 controller.run()
