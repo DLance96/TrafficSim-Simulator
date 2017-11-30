@@ -331,6 +331,8 @@ class Vehicle:
         self.x = x
 
         self.y = y
+    def respond_intersection(self, intersection):
+        return 0
 
     def respond_vehicle(self, other_vehicle):
         """
