@@ -1,6 +1,6 @@
 import pygame
 from src.DisplayController import DisplayController
-
+import time
 from pygame.locals import *
 
 
@@ -54,13 +54,16 @@ class SimulationController:
         :rtype: Reporter
         """
         seconds_run = 0
-
+        ms_per_frame = 1/self.frames_per_second*1000
+        start_time_ms = 0
         while seconds_run < self.seconds_to_run or self.seconds_to_run == -1:
             if self.seconds_to_run != -1:
                 seconds_run += float(self.ticktime_ms) / 1000
             self.tick()
             self.tock()
-            self.display_controller.render(self.traffic_map)
+            if start_time_ms + ms_per_frame < int(round(time.time() * 1000)):
+                start_time_ms = int(round(time.time() * 1000))
+                self.display_controller.render(self.traffic_map)
 
     def tick(self):
         """
