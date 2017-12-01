@@ -2,11 +2,12 @@ import math
 import sys
 import os
 import xml.etree.ElementTree as ET
+from pygame.locals import Color
 
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 from src.xml_parse.Exceptions import XMLFormatError
-from src.xml_parse.Constants import IMPORT_ROAD_TOLERANCE, LANE_WIDTH, TEMPLATE_PAIR_FREQ_DEFAULT
+from src.xml_parse.Constants import IMPORT_ROAD_TOLERANCE, LANE_WIDTH, TEMPLATE_PAIR_FREQ_DEFAULT, YELLOW_DEFAULT
 from src.xml_parse.Utils import is_connected_traffic_map, distance, add_angles
 from src.TemplatePairFactory import TemplatePairFactory
 from src.drivers.DriverTemplate import DriverTemplate
@@ -14,6 +15,7 @@ from src.vehicles.VehicleTemplate import VehicleTemplate
 from src.Road import Road
 from src.Intersection import Intersection
 from src.TrafficMap import TrafficMap
+from src.TrafficCycle import TrafficCycle
 from src.SimulationController import SimulationController
 
 
@@ -82,11 +84,66 @@ def generate_intersection(intersection):
     if intersection.find('radius') is None:
         raise XMLFormatError('Missing radius in a intersection')
     radius = int(intersection.find('radius').text)
-    if intersection.find('driver_vehicle_template') is None:
-        template_pair_factory = TemplatePairFactory(TEMPLATE_PAIR_FREQ_DEFAULT,
-                                                    [((0, 1), DriverTemplate(),VehicleTemplate())])
-    if intersection.find('traffic_cycle') is not None:
+    if intersection.find('spawning_profiles') is None:
         pass
+        template_pair_factory = TemplatePairFactory(TEMPLATE_PAIR_FREQ_DEFAULT,
+                                                    [((0, 1), DriverTemplate(), VehicleTemplate())])
+    else:
+        spawning_profiles = []
+        frequency = int(intersection.find('spawning_profiles').text)
+        for spawning_profile in intersection.find('spawning_profiles').findall('profile'):
+            driver_profile = spawning_profile.find('driver')
+            vehicle_profile = spawning_profile.find('vehicle')
+
+            brake_factor = float(driver_profile.find('brake_factor').text)
+            speed_offset = int(driver_profile.find('speed_offset').text)
+            follow_time = int(driver_profile.find('follow_time').text)
+            driver_max_accel = int(driver_profile.find('max_accel').text)
+            driver_min_accel = int(driver_profile.find('min_accel').text)
+            max_speed = int(driver_profile.find('max_speed').text)
+            accel_time = int(driver_profile.find('accel_time').text)
+            update_time = int(driver_profile.find('update_time').text)
+            inter_time = int(driver_profile.find('inter_time').text)
+            driver_color_values = list(map(int, driver_profile.find('color').split(' ')))
+            driver_color = Color(driver_color_values[0], driver_color_values[1], driver_color_values[2])
+
+            driver = DriverTemplate(brake_factor, speed_offset, follow_time, driver_max_accel, driver_min_accel,
+                                    max_speed, accel_time, update_time, inter_time, driver_color)
+
+            length = int(vehicle_profile.find('length').text)
+            width = int(vehicle_profile.find('width').text)
+            vehicle_max_decel = float(vehicle_profile.find('max_decel').text)
+            vehicle_max_accel = float(vehicle_profile.find('max_accel').text)
+            mass = int(vehicle_profile.find('mass').text)
+            max_speed = int(vehicle_profile.find('max_speed').text)
+            turn_speed = int(vehicle_profile.find('turn_speed').text)
+            vehicle_color_values = list(map(int, vehicle_profile.find('color').split(' ')))
+            vehicle_color = Color(vehicle_color_values[0], vehicle_color_values[1], vehicle_color_values[2])
+
+            vehicle = VehicleTemplate(length, width, vehicle_max_decel, vehicle_max_accel,
+                                      mass, max_speed, turn_speed, vehicle_color)
+
+            probability_range = list()
+            starting_prob = len(spawning_profiles) / len(intersection.find('spawning_profiles').findall('profile'))
+            ending_prob = (1 + len(spawning_profiles)) / len(intersection.find('spawning_profiles').findall('profile'))
+            probability_range.append(starting_prob)
+            probability_range.append(ending_prob)
+
+            profile = (probability_range, driver, vehicle)
+            spawning_profiles.append(profile)
+        template_pair_factory = TemplatePairFactory(frequency, spawning_profiles, mix_and_match=False)
+
+    if intersection.find('traffic_cycle') is not None:
+        green_light = []
+        timings = []
+        if intersection.find('traffic_cycle').find('yellow_light') is not None:
+            yellow_light = 1000 * int(intersection.find('traffic_cycle').find('yellow_light').text)
+        else:
+            yellow_light = YELLOW_DEFAULT
+        for cycle in intersection.find('traffic_cycle').findall('cycle'):
+            green_light.append(list(map(int, cycle.find('roads').text.split(' '))))
+            timings.append(int(cycle.find('timing').text))
+        traffic_cycle = TrafficCycle(green_light=green_light, timings=timings, yellow_light_length=yellow_light)
 
     return Intersection(center=center_point, radius=radius, speed_limit=200,
                         template_factory=template_pair_factory, traffic_cycle=traffic_cycle)
