@@ -2,31 +2,36 @@ from pygame.locals import *
 
 
 class VehicleTemplate:
-    def __init__(self):
+    def __init__(self, length = 8, width = 4,
+                 max_decel = 4.5, max_accel = 2,
+                 mass = 2000, max_speed = 200,
+                 max_turn_rad_per_sec = 3, color = Color(255, 100, 100)):
 
         # length of vehicle
-        self.length = 8
+        self.length = length
 
         # width of vehicle
 
-        self.width = 4
+        self.width = width
 
         # max braking decel of car
-        self.max_brake_decel = 4.5
+        self.max_brake_decel = max_decel
 
         # max acceleration of vehicle
-        self.max_accel = 2
+        self.max_accel = max_accel
 
         # mass of vehicle
-        self.mass = 2000
+        self.mass = mass
 
         # maximum speed of vehicle
-        self.max_speed = 200
+        self.max_speed = max_speed
 
-        self.max_turn_rad_per_sec = 3
+        self.max_turn_rad_per_sec = max_turn_rad_per_sec
 
-        self.color = Color(255, 100, 100)
+        self.color = color
 
+# For reference
+"""
 class Ferrari(VehicleTemplate):
 
     def __init__(self):
@@ -35,3 +40,4 @@ class Ferrari(VehicleTemplate):
         self.max_speed = 100
         self.max_brake_decel = 6
         self.color = Color(10, 231, 255)
+"""
