@@ -1,0 +1,59 @@
+Traffic System Report
+Intersections
+Intersection Name: 0
+Average Number of Vehicles in the Intersection
+1.6033333333333333
+Average Average Speed of Vehicles in the Intersection
+10.247126157889431
+Number of Crashes in the Intersection
+8
+Intersection Name: 1
+Average Number of Vehicles in the Intersection
+1.6233333333333333
+Average Average Speed of Vehicles in the Intersection
+10.702416128255813
+Number of Crashes in the Intersection
+7
+Intersection Name: 2
+Average Number of Vehicles in the Intersection
+1.65
+Average Average Speed of Vehicles in the Intersection
+10.963021455349141
+Number of Crashes in the Intersection
+6
+Intersection Name: 3
+Average Number of Vehicles in the Intersection
+1.7366666666666666
+Average Average Speed of Vehicles in the Intersection
+10.667187984857062
+Number of Crashes in the Intersection
+4
+Roads
+Road Name: 0
+Average Number of Vehicles on the Road
+9.093333333333334
+Average - Average Speed of Vehicles on the Road
+20.93500108230418
+Number of Crashes on the Road
+4
+Road Name: 1
+Average Number of Vehicles on the Road
+8.5
+Average - Average Speed of Vehicles on the Road
+24.347054910913954
+Number of Crashes on the Road
+4
+Road Name: 2
+Average Number of Vehicles on the Road
+8.81
+Average - Average Speed of Vehicles on the Road
+23.790636164680507
+Number of Crashes on the Road
+6
+Road Name: 3
+Average Number of Vehicles on the Road
+8.19
+Average - Average Speed of Vehicles on the Road
+23.720550999541995
+Number of Crashes on the Road
+3
