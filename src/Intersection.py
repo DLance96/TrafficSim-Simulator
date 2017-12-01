@@ -369,5 +369,4 @@ class Intersection(Surface):
             else:
                 return "red"
         else:
-            # To be removed
             raise ValueError("The given road is not one of the roads attached to this intersection.")
