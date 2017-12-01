@@ -90,23 +90,26 @@ def generate_intersection(intersection):
                                                     [((0, 1), DriverTemplate(), VehicleTemplate())])
     else:
         spawning_profiles = []
-        frequency = int(intersection.find('spawning_profiles').text)
+        frequency = int(intersection.find('frequency').text)
         for spawning_profile in intersection.find('spawning_profiles').findall('profile'):
             driver_profile = spawning_profile.find('driver')
             vehicle_profile = spawning_profile.find('vehicle')
 
             brake_factor = float(driver_profile.find('brake_factor').text)
-            speed_offset = int(driver_profile.find('speed_offset').text)
+            # speed_offset = int(driver_profile.find('speed_offset').text)
+            speed_offset = 0
             follow_time = int(driver_profile.find('follow_time').text)
             driver_max_accel = int(driver_profile.find('max_accel').text)
             driver_min_accel = int(driver_profile.find('min_accel').text)
             max_speed = int(driver_profile.find('max_speed').text)
             accel_time = int(driver_profile.find('accel_time').text)
             update_time = int(driver_profile.find('update_time').text)
-            inter_time = int(driver_profile.find('inter_time').text)
-            driver_color_values = list(map(int, driver_profile.find('color').split(' ')))
-            driver_color = Color(driver_color_values[0], driver_color_values[1], driver_color_values[2])
+            # inter_time = int(driver_profile.find('inter_time').text)
+            inter_time = 6
+            # driver_color_values = list(map(int, driver_profile.find('color').split(' ')))
+            # driver_color = Color(driver_color_values[0], driver_color_values[1], driver_color_values[2])
 
+            driver_color = Color(255, 100, 100)
             driver = DriverTemplate(brake_factor, speed_offset, follow_time, driver_max_accel, driver_min_accel,
                                     max_speed, accel_time, update_time, inter_time, driver_color)
 
@@ -117,9 +120,10 @@ def generate_intersection(intersection):
             mass = int(vehicle_profile.find('mass').text)
             max_speed = int(vehicle_profile.find('max_speed').text)
             turn_speed = int(vehicle_profile.find('turn_speed').text)
-            vehicle_color_values = list(map(int, vehicle_profile.find('color').split(' ')))
-            vehicle_color = Color(vehicle_color_values[0], vehicle_color_values[1], vehicle_color_values[2])
+            # vehicle_color_values = list(map(int, vehicle_profile.find('color').split(' ')))
+            # vehicle_color = Color(vehicle_color_values[0], vehicle_color_values[1], vehicle_color_values[2])
 
+            vehicle_color = Color(255, 100, 100)
             vehicle = VehicleTemplate(length, width, vehicle_max_decel, vehicle_max_accel,
                                       mass, max_speed, turn_speed, vehicle_color)
 
@@ -145,7 +149,7 @@ def generate_intersection(intersection):
             timings.append(int(cycle.find('timing').text))
         traffic_cycle = TrafficCycle(green_lights=green_light, timings=timings, yellow_light_length=yellow_light)
 
-    return Intersection(center=center_point, radius=radius, speed_limit=200,
+    return Intersection(center=center_point, radius=radius, speed_limit=10,
                         template_factory=template_pair_factory, traffic_cycle=traffic_cycle)
 
 
