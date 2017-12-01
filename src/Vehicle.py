@@ -54,7 +54,6 @@ class Vehicle:
         self.drivertype = drivertype
         self.bucket = None
 
-
         navlen = 10
         current_intersection = self.intersection
         prev_road = None
@@ -253,12 +252,27 @@ class Vehicle:
                 # make sure slowdown does not cause braking
                 self.ax += -slowdown_decel * direction
 
+        #compute ay for merging into lanes
+        lane_loc_list = []
+        if direction == -1:
+            for i in range(1, self.road.inbound_lanes):
+                lane_loc_list.append(i*self.road.lane_width - self.road.lane_width/2)
+        else:
+            for i in range(1, self.road.outbound_lanes):
+                lane_loc_list.append(self.road.width - i*self.road.lane_width + self.road.lane_width/2)
+
+        min_dist = self.road.lane_width*2 + self.road.width
+        nearest = self.road.lane_width*2 + self.road.width
+        for loc in lane_loc_list:
+            if abs(self.y - loc) < min_dist:
+                min_dist = abs(self.y - loc)
+                nearest = loc
+
+        self.vy = (nearest - self.y)/10
         # increment vx by ax
         self.vx += self.ax * ticktime_ms / 1000
         # increment vy by ay
         self.vy += self.ay * ticktime_ms / 1000
-        # placeholder
-        self.vy = 0
         # return next position based on vx, vy
         return self.x + self.vx * ticktime_ms / 1000, self.y + self.vy * ticktime_ms / 1000
 
