@@ -137,7 +137,7 @@ def generate_intersection(intersection):
         green_light = []
         timings = []
         if intersection.find('traffic_cycle').find('yellow_light') is not None:
-            yellow_light = 1000 * int(intersection.find('traffic_cycle').find('yellow_light').text)
+            yellow_light = int(intersection.find('traffic_cycle').find('yellow_light').text)
         else:
             yellow_light = YELLOW_DEFAULT
         for cycle in intersection.find('traffic_cycle').findall('cycle'):
