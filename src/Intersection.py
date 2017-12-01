@@ -241,6 +241,11 @@ class Intersection(Surface):
                 # I am assuming that vehicles will want to know which vehicle they collided with.
                 v1.collided(v2)
                 v2.collided(v1)
+                # Collided vehicles are removed from the map.
+                if v1 in self.vehicles:
+                    self.vehicles.remove(v1)
+                if v2 in self.vehicles:
+                    self.vehicles.remove(v2)
 
         return count
 
