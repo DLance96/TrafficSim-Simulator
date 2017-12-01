@@ -144,7 +144,7 @@ class Vehicle:
         return self.x + self.vx * time_ahead, self.y + self.vy * time_ahead
 
     def correct_direction(self):
-        return -1 if (self.y <= self.road.lane_width * self.road.outbound_lanes) else 1
+        return -1 if (self.y < self.road.lane_width * self.road.inbound_lanes) else 1
 
     # Takes a road and a local location and sets the car to being on that road at that location
     # Cars enter roads parallel to the road
@@ -255,11 +255,11 @@ class Vehicle:
         #compute ay for merging into lanes
         lane_loc_list = []
         if direction == -1:
-            for i in range(1, self.road.inbound_lanes):
-                lane_loc_list.append(i*self.road.lane_width - self.road.lane_width/2)
+            for i in range(0, self.road.inbound_lanes):
+                lane_loc_list.append((i+1)*self.road.lane_width - self.road.lane_width/2)
         else:
-            for i in range(1, self.road.outbound_lanes):
-                lane_loc_list.append(self.road.width - i*self.road.lane_width + self.road.lane_width/2)
+            for i in range(0, self.road.outbound_lanes):
+                lane_loc_list.append(self.road.width - (i+1)*self.road.lane_width + self.road.lane_width/2)
 
         min_dist = self.road.lane_width*2 + self.road.width
         nearest = self.road.lane_width*2 + self.road.width
