@@ -18,8 +18,8 @@ class DisplayController:
         self.xoffset = 0
         self.yoffset = 0
         self.display_zoom = self.display_size
-        self.debug_intersection = True
-        self.debug_road = True
+        self.debug_intersection = False
+        self.debug_road = False
         self.debug_road_aware = False
 
     def transform(self, keys_down):
