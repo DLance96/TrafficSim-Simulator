@@ -22,8 +22,8 @@ initial_intersection = Intersection(center = (200, 220), radius = 100, speed_lim
                                     template_factory = None)
 terminal_intersection = Intersection(center = (1000, 220), radius = 100, speed_limit = 200,
                                      template_factory = None)
-initial_intersection.bind_road_to_intersection(onlyroad,'terminal')
-terminal_intersection.bind_road_to_intersection(onlyroad,'initial')
+initial_intersection.bind_road_to_intersection(onlyroad,'initial')
+terminal_intersection.bind_road_to_intersection(onlyroad,'terminal')
 trafficmap.roadlist.append(onlyroad)
 trafficmap.intersectionlist.append(initial_intersection)
 trafficmap.intersectionlist.append(terminal_intersection)

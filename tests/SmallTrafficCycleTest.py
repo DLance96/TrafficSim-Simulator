@@ -28,8 +28,8 @@ terminal_intersection = Intersection(center = (1000, 220), radius = 30, speed_li
                                      template_factory=TemplatePairFactory(10000, prebuilt_list),
                                     traffic_cycle = TrafficCycle(green_lights=[[0], [1]], timings=[20000, 20000],
                                                                  yellow_light_length=6000))
-initial_intersection.bind_road_to_intersection(onlyroad,'terminal')
-terminal_intersection.bind_road_to_intersection(onlyroad,'initial')
+initial_intersection.bind_road_to_intersection(onlyroad,'initial')
+terminal_intersection.bind_road_to_intersection(onlyroad,'terminal')
 
 trafficmap.add_road(onlyroad)
 trafficmap.add_intersection(initial_intersection)

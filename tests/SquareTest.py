@@ -33,17 +33,17 @@ upper_right_intersection = Intersection(center = (640, 100), radius = 30, speed_
                                         template_factory = TemplatePairFactory(1000, prebuilt_list))
 
 # For each of the intersections add the appropriate neighboring roads
-lower_left_intersection.bind_road_to_intersection(lower_road, 'terminal')
-lower_left_intersection.bind_road_to_intersection(left_road, 'initial')
+lower_left_intersection.bind_road_to_intersection(lower_road, 'initial')
+lower_left_intersection.bind_road_to_intersection(left_road, 'terminal')
 
-lower_right_intersection.bind_road_to_intersection(lower_road, 'initial')
-lower_right_intersection.bind_road_to_intersection(right_road, 'terminal')
+lower_right_intersection.bind_road_to_intersection(lower_road, 'terminal')
+lower_right_intersection.bind_road_to_intersection(right_road, 'initial')
 
-upper_right_intersection.bind_road_to_intersection(upper_road, 'terminal')
-upper_right_intersection.bind_road_to_intersection(right_road, 'initial')
+upper_right_intersection.bind_road_to_intersection(upper_road, 'initial')
+upper_right_intersection.bind_road_to_intersection(right_road, 'terminal')
 
-upper_left_intersection.bind_road_to_intersection(upper_road, 'initial')
-upper_left_intersection.bind_road_to_intersection(left_road, 'terminal')
+upper_left_intersection.bind_road_to_intersection(upper_road, 'terminal')
+upper_left_intersection.bind_road_to_intersection(left_road, 'initial')
 
 # Add the roads to the trafficmap
 trafficmap.add_road(lower_road)

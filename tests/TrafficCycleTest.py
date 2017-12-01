@@ -43,17 +43,17 @@ left_intersection = Intersection(center = (400 - 353, 50 + 353), radius = 30, sp
                                                             yellow_light_length=6000))
 
 # For each of the intersections add the appropriate neighboring roads
-left_intersection.bind_road_to_intersection(lower_left_road, 'initial')
-left_intersection.bind_road_to_intersection(upper_left_road, 'terminal')
+left_intersection.bind_road_to_intersection(lower_left_road, 'terminal')
+left_intersection.bind_road_to_intersection(upper_left_road, 'initial')
 
-lower_intersection.bind_road_to_intersection(lower_left_road, 'terminal')
-lower_intersection.bind_road_to_intersection(lower_right_road, 'initial')
+lower_intersection.bind_road_to_intersection(lower_left_road, 'initial')
+lower_intersection.bind_road_to_intersection(lower_right_road, 'terminal')
 
-right_intersection.bind_road_to_intersection(upper_right_road, 'initial')
-right_intersection.bind_road_to_intersection(lower_right_road, 'terminal')
+right_intersection.bind_road_to_intersection(upper_right_road, 'terminal')
+right_intersection.bind_road_to_intersection(lower_right_road, 'initial')
 
-upper_intersection.bind_road_to_intersection(upper_right_road, 'terminal')
-upper_intersection.bind_road_to_intersection(upper_left_road, 'initial')
+upper_intersection.bind_road_to_intersection(upper_right_road, 'initial')
+upper_intersection.bind_road_to_intersection(upper_left_road, 'terminal')
 
 # Add the roads to the trafficmap
 trafficmap.add_road(lower_left_road)
