@@ -311,7 +311,14 @@ class Intersection(Surface):
         else:
             # It's like adding a spoke at the right place in a wheel
             for i in range(len(self.adjacent_roads)):
-                if (self.adjacent_road_orientations[i] < orientation) \
+                if orientation < self.adjacent_road_orientations[0]:
+                    index = 0
+                    self.adjacent_roads.insert(index, road)
+                    self.adjacent_road_orientations.insert(index, orientation)
+                    self.adjacent_road_widths.insert(index, width)
+                    self.adjacent_road_bounding_orientations.insert(index, (upper_angle, lower_angle))
+                    break
+                elif (self.adjacent_road_orientations[i] < orientation) \
                         and (i == len(self.adjacent_roads) - 1 \
                              or (self.adjacent_road_orientations[i + 1] > orientation)):
                     index = i + 1
@@ -320,7 +327,6 @@ class Intersection(Surface):
                     self.adjacent_road_widths.insert(index, width)
                     self.adjacent_road_bounding_orientations.insert(index, (upper_angle, lower_angle))
                     break
-
         return
 
     def bind_road_to_intersection(self, road, side):
@@ -363,4 +369,5 @@ class Intersection(Surface):
             else:
                 return "red"
         else:
+            # To be removed
             raise ValueError("The given road is not one of the roads attached to this intersection.")

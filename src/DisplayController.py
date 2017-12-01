@@ -11,7 +11,7 @@ class DisplayController:
         Initializes DisplayController
         """
         pygame.init()
-        self.display_size = 1200, 800
+        self.display_size = 2000, 2000
         self.display_surface = pygame.display.set_mode(self.display_size, pygame.HWSURFACE | pygame.DOUBLEBUF)
         self.draw_surface = pygame.Surface(self.display_size)
 
