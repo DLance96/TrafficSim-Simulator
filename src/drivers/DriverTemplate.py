@@ -4,7 +4,7 @@ from pygame.locals import *
 class DriverTemplate:
 
     def __init__(self, over_braking_factor = 0.1, speeding_offset = 0,
-                 following_time = 3, max_accel = 2,
+                 following_time = 3, max_accel = 6,
                  min_accel = 0, max_speed = 200,
                  accel_time = 10, update_time_ms = 30,
                  intersection_prep_time = 6,
@@ -36,7 +36,7 @@ class DriverTemplate:
 
         self.intersection_prep_time = intersection_prep_time
 
-        self.color = Color(255, 100, 100)
+        self.color = color
 
 # For reference
 """
