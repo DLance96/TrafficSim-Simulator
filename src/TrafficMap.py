@@ -7,11 +7,11 @@ class TrafficMap:
     """
     :type roadlist: list(Road)
     """
-    def __init__(self):
+    def __init__(self, reporter = Reporter()):
 
         self.roadlist = []
         self.intersectionlist = []
-        self.reporter = Reporter()
+        self.reporter = reporter
 
     def add_road(self, road):
         road.set_name(len(self.roadlist))
@@ -67,9 +67,3 @@ class TrafficMap:
 
         for i in range(len(self.intersectionlist)):
             self.intersectionlist[i].tock_crashes()
-
-    def report(self, compact = True, output_file = None):
-        if compact:
-            self.reporter.generate_compact_report(output_file)
-        else:
-            self.reporter.generate_complete_report(output_file)
