@@ -289,10 +289,28 @@ class Road(Surface):
             for (v1, v2) in vehicle_pairs:
                 if self.have_collided(v1, v2):
                     count += 1
-                    pass
                     # I am assuming that vehicles will want to know which vehicle they collided with.
                     v1.collided(v2)
                     v2.collided(v1)
+                    # Collided vehicles are simply removed from the road (tow trucks are fast in this universe)
+                    if v1 in self.vehicles:
+                        self.vehicles.remove(v1)
+                    if v2 in self.vehicles:
+                        self.vehicles.remove(v2)
+                    if v1 in preceding:
+                        bucket.get_previous_bucket().remove(v1)
+                    elif v1 in following:
+                        bucket.get_next_bucket().remove(v1)
+                    else:
+                        bucket.remove(v1)
+                    if v2 in preceding:
+                        bucket.get_previous_bucket().remove(v2)
+                    elif v2 in following:
+                        bucket.get_next_bucket().remove(v2)
+                    else:
+                        bucket.remove(v2)
+
+
 
 
         return count

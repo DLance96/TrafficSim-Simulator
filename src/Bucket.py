@@ -154,22 +154,22 @@ class Bucket:
 
     def remove(self, vehicle):
         """
-        Removes the provided vehicle from the Bucket. Updates aliveness and the aliveness linked list.
+        Removes the provided vehicle from the Bucket if it is present. Updates aliveness and the aliveness linked list.
         :param vehicle:
         :return:
         """
-
-        self.vehicles.remove(vehicle)
-        self.number_of_vehicles -= 1
-        if self.number_of_vehicles == 0:
-            # Process of becoming dead
-            self.alive = False
-            if self.previous_alive_bucket is not None:
-                self.previous_alive_bucket.set_next_alive_bucket(self.next_alive_bucket)
-            if self.next_alive_bucket is not None:
-                self.next_alive_bucket.set_previous_alive_bucket(self.previous_alive_bucket)
-            self.next_alive_bucket = None
-            self.previous_alive_bucket = None
+        if vehicle in self.vehicles:
+            self.vehicles.remove(vehicle)
+            self.number_of_vehicles -= 1
+            if self.number_of_vehicles == 0:
+                # Process of becoming dead
+                self.alive = False
+                if self.previous_alive_bucket is not None:
+                    self.previous_alive_bucket.set_next_alive_bucket(self.next_alive_bucket)
+                if self.next_alive_bucket is not None:
+                    self.next_alive_bucket.set_previous_alive_bucket(self.previous_alive_bucket)
+                self.next_alive_bucket = None
+                self.previous_alive_bucket = None
 
         return
 

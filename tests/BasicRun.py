@@ -9,9 +9,6 @@ from src.Intersection import Intersection
 from src.drivers.DriverTemplate import  DriverTemplate
 from src.vehicles.VehicleTemplate import VehicleTemplate
 from src.TemplatePairFactory import TemplatePairFactory
-from src.drivers.DriverTemplate import SpeedoFerraro
-from src.drivers.DriverTemplate import SlowDriver
-from src.vehicles.VehicleTemplate import Ferrari
 
 trafficmap = TrafficMap()
 prebuilt_list = [((0, 1), DriverTemplate(),VehicleTemplate())]
