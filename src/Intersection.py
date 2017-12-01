@@ -311,7 +311,9 @@ class Intersection(Surface):
         else:
             # It's like adding a spoke at the right place in a wheel
             for i in range(len(self.adjacent_roads)):
-                if (self.adjacent_road_orientations[i] < orientation) and (self.adjacent_road_orientations[i + 1] > orientation):
+                if (self.adjacent_road_orientations[i] < orientation) \
+                        and (i == len(self.adjacent_roads) - 1 \
+                             or (self.adjacent_road_orientations[i + 1] > orientation)):
                     index = i + 1
                     self.adjacent_roads.insert(index, road)
                     self.adjacent_road_orientations.insert(index, orientation)
