@@ -227,4 +227,5 @@ class DisplayController:
         :return:
         """
         road_color = Color(100, 100, 100)
-        pygame.draw.circle(self.draw_surface, road_color, intersection.center, intersection.radius)
+        pygame.draw.circle(self.draw_surface, road_color,
+                           [int(intersection.center[0]), int(intersection.center[1])], intersection.radius)
