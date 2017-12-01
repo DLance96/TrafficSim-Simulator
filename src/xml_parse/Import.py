@@ -143,7 +143,7 @@ def generate_intersection(intersection):
         for cycle in intersection.find('traffic_cycle').findall('cycle'):
             green_light.append(list(map(int, cycle.find('roads').text.split(' '))))
             timings.append(int(cycle.find('timing').text))
-        traffic_cycle = TrafficCycle(green_light=green_light, timings=timings, yellow_light_length=yellow_light)
+        traffic_cycle = TrafficCycle(green_lights=green_light, timings=timings, yellow_light_length=yellow_light)
 
     return Intersection(center=center_point, radius=radius, speed_limit=200,
                         template_factory=template_pair_factory, traffic_cycle=traffic_cycle)
