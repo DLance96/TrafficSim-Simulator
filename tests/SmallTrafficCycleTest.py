@@ -18,7 +18,7 @@ trafficmap = TrafficMap()
 # Create the TemplatePairFactory prebuilt list for the intersections
 prebuilt_list = [((0, 1), DriverTemplate(),VehicleTemplate())]
 
-onlyroad = Road([200,200], 800, 2, 2, 0, 50)
+onlyroad = Road([220,200], 760, 2, 2, 0, 50)
 
 initial_intersection = Intersection(center = (200, 220), radius = 30, speed_limit = 200,
                                     template_factory=TemplatePairFactory(10000, prebuilt_list),
