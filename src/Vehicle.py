@@ -343,7 +343,7 @@ class Vehicle:
         relevant_intersection = self.road.terminal_intersection if self.correct_direction() == 1 else self.road.initial_intersection
         intersection_speed = relevant_intersection.speed_limit if relevant_intersection.status_of_light(self.road) == 'green' else 0
         relevantx = self.road.length if self.correct_direction() == 1 else 0
-        time_until = abs(self.x - relevantx) / abs(self.vx)
+        time_until = (abs(self.x - relevantx) - 30) / abs(self.vx)
 
         if time_until < self.drivertype.intersection_prep_time:
             if time_until != 0 and abs(self.vx) > intersection_speed:
