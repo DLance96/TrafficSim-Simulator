@@ -15,7 +15,7 @@ class DriverTemplate:
         self.following_time = 3
 
         # max acceleration of driver
-        self.max_accel = 2
+        self.max_accel = 4
 
         # minimum acceleration of driver
         self.min_accel = 0
