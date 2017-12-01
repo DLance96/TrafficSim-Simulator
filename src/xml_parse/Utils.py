@@ -23,15 +23,18 @@ def is_connected_traffic_map(roads, intersections):
 
     while len(to_visit_roads) > 0:
         road = to_visit_roads.pop()
-        new_roads = []
-        if road.get_start_connection() is not None and road.get_start_connection() not in visited_intersections:
-            new_roads.extend(road.get_start_connection().get_connections())
-            visited_intersections.append(road.get_start_connection())
-        if road.get_end_connection() is not None and road.get_end_connection() not in visited_intersections:
-            new_roads.extend(road.get_end_connection().get_connections())
-            visited_intersections.append(road.get_end_connection())
-        remove_visited_roads(new_roads, visited_roads)
         visited_roads.append(road)
+        new_roads = []
+        if road.initial_intersection is not None and road.initial_intersection not in visited_intersections:
+            new_roads.extend(road.initial_intersection.adjacent_roads)
+            visited_intersections.append(road.initial_intersection)
+        if road.terminal_intersection is not None and road.terminal_intersection not in visited_intersections:
+            new_roads.extend(road.terminal_intersection.adjacent_roads)
+            visited_intersections.append(road.terminal_intersection)
+        new_roads = list(set(new_roads))
+        remove_visited_roads(new_roads, visited_roads)
+        remove_visited_roads(new_roads, to_visit_roads)
+        to_visit_roads.extend(new_roads)
 
     if len(roads) == len(visited_roads) and len(intersections) == len(visited_intersections):
         return True
@@ -67,7 +70,7 @@ def distance(coord1, coord2):
     :param coord2: xy coordinate
     :return: float distance
     """
-    x_diff = coord1.get_x() - coord2.get_x()
-    y_diff = coord1.get_y() - coord2.get_y()
+    x_diff = coord1[0] - coord2[0]
+    y_diff = coord1[1] - coord2[1]
     dist = (x_diff ** 2 + y_diff ** 2) ** .5
     return round(dist, SIG_FIGS)
