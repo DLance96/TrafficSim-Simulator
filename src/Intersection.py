@@ -272,7 +272,7 @@ class Intersection(Surface):
         :return:
         """
 
-        orientation = road.orientation if side == "terminal" else (road.orientation + math.pi) % (2 * math.pi)
+        orientation = road.orientation if side == "initial" else (road.orientation + math.pi) % (2 * math.pi)
         width = road.width
         sine = (width / 2) / self.radius
         angle = math.asin(sine)
