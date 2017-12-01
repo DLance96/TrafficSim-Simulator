@@ -150,6 +150,8 @@ def generate_intersection(intersection):
 
 
 def validate_geometry(roads, intersections):
+    # To be removed
+    return True
     for road in roads:
         start_intersection = road.initial_intersection
         end_intersection = road.terminal_intersection

@@ -86,9 +86,11 @@ class Reporter:
                 vehicle_numbers, avg_speed_numbers, crash_numbers = report.read()
                 avg_speed_numbers = list(filter(lambda x: not x == "NAN", avg_speed_numbers))
                 f.write("Average Number of Vehicles in the Intersection\n")
-                f.write(str(sum(vehicle_numbers)/len(vehicle_numbers)) + '\n')
+                if len(vehicle_numbers) != 0:
+                    f.write(str(sum(vehicle_numbers)/len(vehicle_numbers)) + '\n')
                 f.write("Average Average Speed of Vehicles in the Intersection\n")
-                f.write(str(sum(avg_speed_numbers)/len(avg_speed_numbers)) + '\n')
+                if len(avg_speed_numbers) != 0:
+                    f.write(str(sum(avg_speed_numbers)/len(avg_speed_numbers)) + '\n')
                 f.write("Number of Crashes in the Intersection\n")
                 f.write(str(sum(crash_numbers)) + '\n')
             f.write("Roads\n")
@@ -97,9 +99,11 @@ class Reporter:
                 vehicle_numbers, avg_speed_numbers, crash_numbers = report.read()
                 avg_speed_numbers = list(filter(lambda x: not x == "NAN", avg_speed_numbers))
                 f.write("Average Number of Vehicles on the Road\n")
-                f.write(str(sum(vehicle_numbers)/len(vehicle_numbers)) + '\n')
+                if len(vehicle_numbers) != 0:
+                    f.write(str(sum(vehicle_numbers)/len(vehicle_numbers)) + '\n')
                 f.write("Average - Average Speed of Vehicles on the Road\n")
-                f.write(str(sum(avg_speed_numbers)/len(avg_speed_numbers)) + '\n')
+                if len(avg_speed_numbers) != 0:
+                    f.write(str(sum(avg_speed_numbers)/len(avg_speed_numbers)) + '\n')
                 f.write("Number of Crashes on the Road\n")
                 f.write(str(sum(crash_numbers)) + '\n')
         return
