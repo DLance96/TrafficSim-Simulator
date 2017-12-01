@@ -54,8 +54,23 @@ class Vehicle:
         self.drivertype = drivertype
         self.bucket = None
 
-        # I don't know why this is here Brett, your comments say that it's legacy, but it seems to need to be set
-        self.roadno = -1
+
+        navlen = 10
+        current_intersection = self.intersection
+        prev_road = None
+
+        self.navlist = []
+        for i in range(navlen):
+            roadind = random.randint(0, len(current_intersection.adjacent_roads)-1)
+            while current_intersection.adjacent_roads[roadind] == prev_road and random.randint(1, 4) != 1:
+                roadind = random.randint(0, len(current_intersection.adjacent_roads)-1)
+            self.navlist.append(current_intersection.adjacent_roads[roadind])
+            prev_road = self.navlist[len(self.navlist)-1]
+            if prev_road.initial_intersection != current_intersection:
+                current_intersection = prev_road.initial_intersection
+            else:
+                current_intersection = prev_road.terminal_intersection
+
 
     def set_bucket(self, bucket):
         """
@@ -248,8 +263,14 @@ class Vehicle:
         return self.x + self.vx * ticktime_ms / 1000, self.y + self.vy * ticktime_ms / 1000
 
     def compute_goal_orientation(self):
-        goal_road_orientation = (self.intersection.adjacent_road_orientations[self.roadno] +
-                                 self.intersection.adjacent_road_bounding_orientations[self.roadno][0]) / 2
+        roaddestno = 0
+        for i in range(len(self.intersection.adjacent_roads)):
+            if self.intersection.adjacent_roads[i] == self.navlist[0]:
+                roaddestno = i
+                break
+
+        goal_road_orientation = (self.intersection.adjacent_road_orientations[roaddestno] +
+                                 self.intersection.adjacent_road_bounding_orientations[roaddestno][0]) / 2
         globalx, globaly = self.intersection.local_to_global_location_conversion((self.x, self.y))
         destination = (self.intersection.center[0] + math.cos(goal_road_orientation) * self.intersection.radius * 1.1,
                        self.intersection.center[1] + math.sin(goal_road_orientation) * self.intersection.radius * 1.1)
@@ -263,12 +284,6 @@ class Vehicle:
        :param: ticktime_ms
        :return: (float, float)
        """
-        # roadno is a placeholder that hsould be deleted
-        if self.roadno == -1:
-            if len(self.intersection.adjacent_road_bounding_orientations) > 1:
-                self.roadno = random.randint(0, len(self.intersection.adjacent_road_bounding_orientations) - 1)
-            else:
-                self.roadno = 0
 
         goal_orientation = self.compute_goal_orientation()
 
@@ -298,7 +313,6 @@ class Vehicle:
     def compute_next_location(self, ticktime_ms):
 
         if self.road is not None:
-            self.roadno = -1
             behind = []
             infront = []
             if self.bucket.get_previous_alive_bucket() is not None:

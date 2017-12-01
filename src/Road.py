@@ -228,7 +228,9 @@ class Road(Surface):
             # Side is "initial" / "terminal"
             neighbor, side = self.which_neighbor(location)
             vehicle.last_road = self
-            neighbor.accept_transfer(vehicle, location, self, side)
+            vehicle.navlist = vehicle.navlist[1:]
+            if len(vehicle.navlist) > 0:
+                neighbor.accept_transfer(vehicle, location, self, side)
             self.vehicles.remove(vehicle)
         except ValueError:
             print("A vehicle couldn't be transferred because it requested an invalid destination.")
