@@ -12,7 +12,7 @@ from src.TemplatePairFactory import TemplatePairFactory
 
 trafficmap = TrafficMap()
 prebuilt_list = [((0, 1), DriverTemplate(),VehicleTemplate())]
-onlyroad = Road([200,200], 800, 2, 2, 0, 100)
+onlyroad = Road([200,210], 800, 1, 1, 0, 100)
 
 initial_intersection = Intersection(center = (100, 220), radius = 130, speed_limit = 10,
                                     template_factory=TemplatePairFactory(10000, prebuilt_list))
