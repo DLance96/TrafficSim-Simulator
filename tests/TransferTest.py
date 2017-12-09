@@ -9,10 +9,6 @@ from src.Vehicle import Vehicle
 from src.Intersection import Intersection
 from src.drivers.DriverTemplate import  DriverTemplate
 from src.vehicles.VehicleTemplate import VehicleTemplate
-from src.TemplatePairFactory import TemplatePairFactory
-from src.drivers.DriverTemplate import SpeedoFerraro
-from src.drivers.DriverTemplate import SlowDriver
-from src.vehicles.VehicleTemplate import Ferrari
 
 trafficmap = TrafficMap()
 prebuilt_list = [((0, 1), DriverTemplate(),VehicleTemplate())]
@@ -29,12 +25,12 @@ trafficmap.intersectionlist.append(initial_intersection)
 trafficmap.intersectionlist.append(terminal_intersection)
 
 spawned_vehicle_1 = Vehicle(surface = initial_intersection, x=0, y=10, vx=50, vy=0, orientation=0,
-                                cartype = Ferrari(),
-                                drivertype = SpeedoFerraro())
+                                cartype = VehicleTemplate(),
+                                drivertype = DriverTemplate())
 initial_intersection.debug_spawn(spawned_vehicle_1)
 spawned_vehicle_2 = Vehicle(surface = terminal_intersection, x=0, y=-10, vx=50, vy=0, orientation=0,
-                                cartype = Ferrari(),
-                                drivertype = SpeedoFerraro())
+                                cartype = VehicleTemplate(),
+                                drivertype = DriverTemplate())
 terminal_intersection.debug_spawn(spawned_vehicle_2)
 
 controller = SimulationController(trafficmap, 200, 100, 60)

@@ -289,7 +289,6 @@ class Road(Surface):
             for (v1, v2) in vehicle_pairs:
                 if self.have_collided(v1, v2):
                     count += 1
-                    pass
                     # I am assuming that vehicles will want to know which vehicle they collided with.
                     v1.collided(v2)
                     v2.collided(v1)
