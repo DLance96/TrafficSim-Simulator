@@ -1,13 +1,12 @@
-import time
-import operator
-import random
-import math
-from src.vehicles.VehicleTemplate import VehicleTemplate
-from src.drivers.DriverTemplate import DriverTemplate
-
 
 class Reporter:
+    """
+    Collects information from each Road and Intersections and produces a report describing that information.
+    """
     class Report:
+        """
+        Contains the provided information from a Road or an Intersection
+        """
 
         def __init__(self):
             self.number_of_vehicles_list = []
@@ -15,6 +14,13 @@ class Reporter:
             self.number_of_crashes_list = []
 
         def add(self, number_of_vehicles, average_speed, number_of_crashes):
+            """
+            Takes the relevant information from a Road/Intersection for a time step and adds it to the Record
+            :param number_of_vehicles:
+            :param average_speed:
+            :param number_of_crashes:
+            :return:
+            """
             self.number_of_vehicles_list.append(number_of_vehicles)
             self.average_speed_list.append(average_speed)
             self.number_of_crashes_list.append(number_of_crashes)
@@ -29,18 +35,49 @@ class Reporter:
         self.road_report_table = {}
 
     def create_intersection_entry(self, intersection_name):
+        """
+        Add an Intersection record to the reporter
+        :param intersection_name:
+        :return:
+        """
         self.intersection_report_table[intersection_name] = self.Report()
 
     def create_road_entry(self, road_name):
+        """
+        Add a Road record to the reporter
+        :param road_name:
+        :return:
+        """
         self.road_report_table[road_name] = self.Report()
 
     def add_info_intersection(self, name, number_of_vehicles, average_speed, number_of_crashes):
+        """
+        Add the information for a timestep to an Intersection Record
+        :param name:
+        :param number_of_vehicles:
+        :param average_speed:
+        :param number_of_crashes:
+        :return:
+        """
         self.intersection_report_table[name].add(number_of_vehicles, average_speed, number_of_crashes)
 
     def add_info_road(self, name, number_of_vehicles, average_speed, number_of_crashes):
+        """
+        Add the informatino for a timestep to a Road Record
+        :param name:
+        :param number_of_vehicles:
+        :param average_speed:
+        :param number_of_crashes:
+        :return:
+        """
         self.road_report_table[name].add(number_of_vehicles, average_speed, number_of_crashes)
 
     def generate_complete_report(self, output_file = None):
+        """
+        Writes the complete report to the specified output file
+        :param output_file:
+        :return:
+        """
 
         if output_file is None:
             output = "Default_Report_Name"
@@ -72,6 +109,12 @@ class Reporter:
         return
 
     def generate_compact_report(self, output_file = None):
+        """
+        Writes the compact report to the specified output file. The report is 'compact' because each
+        collection of information for each Record is averaged over the timesteps.
+        :param output_file:
+        :return:
+        """
 
         if output_file is None:
             output = "Default_Report_Name"

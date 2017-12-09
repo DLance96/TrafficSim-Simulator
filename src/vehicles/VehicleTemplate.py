@@ -2,6 +2,12 @@ from pygame.locals import *
 
 
 class VehicleTemplate:
+    """
+    Provides a collection of information needed by a vehicle to determine driving behavior.
+    The information stored in a DriverTemplate is relevant to the properties of the vehicle
+    """
+
+
     def __init__(self, length = 8, width = 4,
                  max_decel = 9, max_accel = 6,
                  mass = 2000, max_speed = 200,
@@ -11,7 +17,6 @@ class VehicleTemplate:
         self.length = length
 
         # width of vehicle
-
         self.width = width
 
         # max braking decel of car

@@ -1,16 +1,17 @@
 import math
-import random
 import time
 import itertools
 from src.Surface import Surface
-from collections import defaultdict
 from shapely import geometry
 from src.Bucket import Bucket
-#from src.Vehicle import Vehicle
-#from src.drivers.DriverTemplate import DriverTemplate
-#from src.vehicles.VehicleTemplate import VehicleTemplate
 
 class Road(Surface):
+    """
+    One of the essential building blocks of the traffic environment. A road has a number of lanes and connects to
+    an intersection on each of its ends. Road supports the tick-tock simulation methods, requesting next locations
+    from vehicles driving on it and handling moving them to their next locations. Road handles transferring vehicles
+    to and from adjacent intersections.
+    """
 
     lane_width = 10
 

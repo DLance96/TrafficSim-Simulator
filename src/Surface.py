@@ -1,6 +1,9 @@
 import numpy as np
 
 class Surface:
+    """
+    Surface is the parent class for Road an Intersection, and provides the implementation for vehicle collisions
+    """
 
     def have_collided(self, veh1, veh2):
         """
