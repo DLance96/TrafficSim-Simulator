@@ -24,6 +24,7 @@ class DisplayController:
 
     def transform(self, keys_down):
         """
+        modifies x, y position based on keys down
         :param keys_down: boolean array of keys currently pressed
         :type keys_down: list(bool)
         :return: None
@@ -31,41 +32,44 @@ class DisplayController:
         move_interval = int(10 * self.display_size[0] / self.display_zoom[0])
         scale_factor = 100
         if keys_down[pygame.K_LEFT]:
-            self.xoffset += move_interval
+            if self.xoffset < 0:
+                self.xoffset += move_interval
 
         if keys_down[pygame.K_RIGHT]:
             self.xoffset -= move_interval
 
         if keys_down[pygame.K_UP]:
-            self.yoffset += move_interval
+            if self.yoffset < 0:
+                self.yoffset += move_interval
 
         if keys_down[pygame.K_DOWN]:
             self.yoffset -= move_interval
 
-        if keys_down[pygame.K_q]:
-            self.display_zoom = (self.display_zoom[0] * 1.01), \
-                                (self.display_zoom[1] * 1.01)
-            # self.xoffset -= self.display_size[0] / scale_factor / 2
-            # self.yoffset -= self.display_size[1] / scale_factor / 2
-
-        if keys_down[pygame.K_w]:
-            if self.display_zoom[0] > 100:
-                self.display_zoom = (self.display_zoom[0] / 1.01), \
-                                    (self.display_zoom[1] / 1.01)
-
-                # self.xoffset += self.display_size[0] / scale_factor / 2
-                # self.yoffset += self.display_size[1] / scale_factor / 2
+        if keys_down[pygame.K_d]:
+            self.debug_road = True
+            self.debug_intersection = True
+        if keys_down[pygame.K_a]:
+            self.debug_road_aware = True
+        if keys_down[pygame.K_b]:
+            self.debug_road_aware = False
+        if keys_down[pygame.K_f]:
+            self.debug_road = False
+            self.debug_intersection = False
 
     def render_road_debug(self, traffic_map):
+        # draws debug for road
         for road in traffic_map.get_roads():
             for vehicle in road.vehicles:
                 monospace = pygame.font.SysFont("monospace", 15)
                 position = road.local_to_global_location_conversion((vehicle.x, vehicle.y))
+
+                # compute acceleration
                 decel_text = monospace.render(
                     "acel " + str(int(100 * vehicle.ax * vehicle.correct_direction()) / 100), 1, (
                     255 * (vehicle.ax * vehicle.correct_direction() <= 0),
                     255 * (vehicle.ax * vehicle.correct_direction() > 0), 0))
 
+                # compute speed
                 speed_text = monospace.render(
                     "speed " + str(int(100 * vehicle.vx * vehicle.correct_direction()) / 100), 1, (0, 255, 255))
 
@@ -73,6 +77,7 @@ class DisplayController:
                 self.draw_surface.blit(speed_text, (position[0], position[1]))
                 awarelist, slowdownlist, brakelist = vehicle.debug_show_response_vehicle()
 
+                # draw debug lines for vehicle awareness
                 if self.debug_road_aware:
                     for other_vehicle_position in awarelist:
                         pygame.draw.line(self.draw_surface, Color(0, 255, 0), position, other_vehicle_position, 1)
@@ -130,34 +135,44 @@ class DisplayController:
         :type traffic_map: TrafficMap
         :rtype: None
         """
+        # read x-press to quit
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
 
+        # reads for esc key to quit
         keys_down = pygame.key.get_pressed()
 
         if keys_down[pygame.K_ESCAPE]:
             pygame.quit()
             quit()
 
+        # transform canvas position based on keys down
         self.transform(keys_down)
 
+        # clear surface
         self.draw_surface.fill(Color(255, 255, 255))
 
+        # draw intersections
         for intersection in traffic_map.get_intersections():
             self.drawIntersection(intersection)
+
+        # draw roads
         for road in traffic_map.get_roads():
             self.drawRoad(road)
 
+        # draw vehicles on intersections
         for intersection in traffic_map.get_intersections():
             for vehicle in intersection.vehicles:
                 self.drawVehicle(intersection, vehicle)
 
+        # draw vehicles on road
         for road in traffic_map.get_roads():
             for vehicle in road.vehicles:
                 self.drawVehicle(road, vehicle)
 
+        # draw traffic lights
         for intersection in traffic_map.get_intersections():
             for road_index, road in enumerate(intersection.adjacent_roads):
                 angles = intersection.adjacent_road_bounding_orientations[road_index]
@@ -176,12 +191,14 @@ class DisplayController:
                     raise ValueError("The status of a light should be 'red', 'yellow', or 'green'.")
                 pygame.draw.line(self.draw_surface, color, point1, point2, 3)
 
+        # if debug flag true, draw debug lines
         if self.debug_intersection:
             self.render_intersection_debug(traffic_map)
 
         if self.debug_road:
             self.render_road_debug(traffic_map)
 
+        # transform and draw
         temp_surface = pygame.transform.scale(self.draw_surface, tuple(map(int, self.display_zoom)))
         self.display_surface.blit(temp_surface, temp_surface.get_rect().move(self.xoffset, self.yoffset))
 
@@ -189,6 +206,9 @@ class DisplayController:
 
     def drawVehicle(self, container, vehicle):
         """
+        Draws vehicle on canvas
+        requires container to get global location
+        :param container:
         :param vehicle:
         :return: None
         """
@@ -207,10 +227,12 @@ class DisplayController:
 
     def drawRoad(self, road):
         """
+        Draws road on canvas
         :param road: Instance of a Road to get rectangle of
         :type road: Road
         :return: None
         """
+        # compute and draw road rectangle
         first = road.anchor
         second = (first[0] + road.length * math.cos(road.orientation),
                   first[1] + road.length * math.sin(road.orientation))
@@ -224,6 +246,8 @@ class DisplayController:
         pointlist = [first, second, third, fourth]
         road_color = Color(100, 100, 100)
         pygame.draw.polygon(self.draw_surface, road_color, pointlist)
+
+        # compute and draw center line
         point1 = (first[0] + (fourth[0] - first[0]) * road.inbound_lanes / (road.inbound_lanes + road.outbound_lanes),
                   first[1] + (fourth[1] - first[1]) * road.inbound_lanes / (road.inbound_lanes + road.outbound_lanes))
 
@@ -234,6 +258,7 @@ class DisplayController:
 
     def drawIntersection(self, intersection):
         """
+        Draws intersection on the draw canvas
         :param intersection: instance of intersection to draw
         :type intersection: Intersection
         :return:

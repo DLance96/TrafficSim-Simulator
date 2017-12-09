@@ -35,10 +35,18 @@ class SimulationController:
         :type frames_per_second: int
         """
         self.traffic_map = traffic_map
+        if traffic_map is None:
+            raise ValueError("traffic_map cannot be None type")
 
         self.ticktime_ms = ticktime_ms
 
+        if ticktime_ms <= 0:
+            raise ValueError("ticktime_ms must be greater than 0")
+
         self.seconds_to_run = seconds_to_run
+
+        if frames_per_second <= 0:
+            raise ValueError("frame_per_second must be greater than 0")
 
         self.frames_per_second = frames_per_second
 

@@ -58,6 +58,7 @@ class Vehicle:
         current_intersection = self.intersection
         prev_road = None
 
+        # construct vehicle navigation
         self.navlist = []
         for i in range(navlen):
             roadind = random.randint(0, len(current_intersection.adjacent_roads)-1)
@@ -128,7 +129,13 @@ class Vehicle:
         return math.sqrt(math.pow(self.cartype.width / 2, 2) + math.pow(self.cartype.length / 2, 2))
 
     def rotate_around_origin(self, x, y, radians):
-
+        """
+        Rotates points around origin
+        :param x:
+        :param y:
+        :param radians:
+        :return:
+        """
         rot_x = x * math.cos(radians) - y * math.sin(radians)
         rot_y = y * math.cos(radians) + x * math.sin(radians)
 
@@ -136,6 +143,7 @@ class Vehicle:
 
     def predict_target_position(self, time_ahead):
         """
+        Predict position of vehicle without regard to its decision making
         :param time_ahead: float
         time_ahead is how many seconds in the future this predicted position
         occurs
@@ -144,11 +152,24 @@ class Vehicle:
         return self.x + self.vx * time_ahead, self.y + self.vy * time_ahead
 
     def correct_direction(self):
+        """
+        Return correct directional modifier based on lane position
+        Directional modifier is a modifier that applies to computations involving increasing or decreasing
+        ax,
+        direction being -1 makes car drive backwards, 1 forwards
+        :return:
+        """
         return -1 if (self.y < self.road.lane_width * self.road.inbound_lanes) else 1
 
-    # Takes a road and a local location and sets the car to being on that road at that location
-    # Cars enter roads parallel to the road
+
     def transfer_to_road(self, road, location):
+        """
+        Takes a road and a local location and sets the car to being on that road at that location
+        Cars enter roads parallel to the road
+        :param road:
+        :param location:
+        :return:
+        """
         self.road = road
         self.intersection = None
         self.x = location[0]
@@ -160,8 +181,15 @@ class Vehicle:
         self.vy = new_velocity[1]
         return
 
-    # Takes an intersection and a local location and sets the car to being in that intersection at that location
+
     def transfer_to_intersection(self, intersection, location, orientation):
+        """
+        Takes an intersection and a local location and sets the car to being in that intersection at that location
+        :param intersection:
+        :param location:
+        :param orientation:
+        :return:
+        """
         self.road = None
         self.intersection = intersection
         self.x = location[0]
@@ -175,6 +203,12 @@ class Vehicle:
         return
 
     def time_until_collision_road(self, vehicle):
+        """
+        Compute time until collision of 2 vehicles
+        return -1 if not possible
+        :param vehicle:
+        :return:
+        """
         if abs(vehicle.y - self.y) * 2 > self.cartype.width + vehicle.cartype.width:
             return -1
         if vehicle.vx == self.vx:
@@ -185,11 +219,22 @@ class Vehicle:
         return time_untilx
 
     def time_until_collision(self, vehicle):
+        """
+        Compute time until collision of 2 vehicles
+        return -1 if not possible
+        :param vehicle:
+        :return:
+        """
         if self.road is not None:
             return self.time_until_collision_road(vehicle)
-        return 0
+        return -1
 
     def compute_following_time_road(self, vehicle):
+        """
+        Compute following time of vehicle in front
+        :param vehicle:
+        :return:
+        """
         direction = self.correct_direction()
         if abs(vehicle.y - self.y) > self.cartype.width + vehicle.cartype.width:
             return -1
@@ -203,6 +248,11 @@ class Vehicle:
         return following_time
 
     def compute_following_time(self, vehicle):
+        """
+        Compute following time of vehicle in front
+        :param vehicle:
+        :return:
+        """
         if self.road is not None:
             return self.compute_following_time_road(vehicle)
         return 0
@@ -277,6 +327,10 @@ class Vehicle:
         return self.x + self.vx * ticktime_ms / 1000, self.y + self.vy * ticktime_ms / 1000
 
     def compute_goal_orientation(self):
+        """
+        Get goal orientation for leaving intersection
+        :return:
+        """
         roaddestno = 0
         for i in range(len(self.intersection.adjacent_roads)):
             if self.intersection.adjacent_roads[i] == self.navlist[0]:
@@ -325,7 +379,11 @@ class Vehicle:
         return self.x + self.vx * ticktime_ms / 1000, self.y + self.vy * ticktime_ms / 1000
 
     def compute_next_location(self, ticktime_ms):
-
+        """
+        Returns next desired location to road
+        :param ticktime_ms:
+        :return:
+        """
         if self.road is not None:
             behind = []
             infront = []
@@ -365,6 +423,12 @@ class Vehicle:
         self.y = y
 
     def respond_intersection(self, ticktime_ms):
+        """
+        Respond to intersection while driving on road by trying to match its speed limit
+
+        :param ticktime_ms:
+        :return:
+        """
         if self.vx == 0:
             return 0
 
@@ -380,6 +444,10 @@ class Vehicle:
         return 0
 
     def debug_show_response_vehicle(self):
+        """
+        Used in debug drawing to track vehicle awareness
+        :return:
+        """
         slowdownlist = []
         brakelist = []
         awarelist = []
