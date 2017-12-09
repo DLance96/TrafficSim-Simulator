@@ -5,10 +5,14 @@ from src.Vehicle import Vehicle
 from src.drivers.DriverTemplate import DriverTemplate
 from src.vehicles.VehicleTemplate import VehicleTemplate
 from itertools import repeat
-from collections import defaultdict
 
 
 class Intersection(Surface):
+    """
+    One of the essential building blocks of a traffic environment. An intersection is a surface on which vehicles
+    can drive. Intersection supports ticking and tocking to update the positions of vehicles, and supports the
+    ability for vehicles to drive onto and off of the intersection to and from adjacent Roads.
+    """
 
     lane_width = 10
 
@@ -83,7 +87,6 @@ class Intersection(Surface):
             if result is not None:
                 # Code to implement converting the resulting vehicle and driver template into a vehicle
                 # and placing it onto the intersection
-                # Vehicles really need pathfinding so that they leave the intersection.
                 # For now, vehicles are created in the middle of the intersection.
                 self.spawn(result[0], result[1])
 

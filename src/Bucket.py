@@ -7,6 +7,8 @@ class Bucket:
     has nextlive *
     has prevlive *
     has length
+    Used in a list within a road to quickly locate cars which may be near each other for collision avoidance,
+    and collision detection.
     """
 
     lane_width = 10

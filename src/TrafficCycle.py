@@ -16,6 +16,10 @@ class TrafficCycle:
         return self.greens.__next__()
 
     def get_yellow_duration(self):
+        """
+        Gets how long the yellow lights at this traffic cycle last
+        :return:
+        """
         return self.yellow_length
 
 
